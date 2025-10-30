@@ -1,0 +1,6 @@
+cricbuzz-livestats/
+├── main.py                 # Core app (Streamlit + SQL + API)
+├── requirements.txt        # Dependencies
+├── .streamlit/
+│   └── secrets.toml        # API key & DB URL
+├── README.md               
