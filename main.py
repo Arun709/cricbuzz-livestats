@@ -14,8 +14,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
-        'Get Help': 'https://github.com/arunds23/cricbuzz-livestats',
-        'Report a bug': 'https://github.com/arunds23/cricbuzz-livestats/issues',
+        'Get Help': 'https://github.com/arunds709/cricbuzz-livestats',
+        'Report a bug': 'https://github.com/arunds709/cricbuzz-livestats/issues',
         'About': 'Live cricket stats + SQL analytics powered by Cricbuzz & PostgreSQL'
     }
 )
@@ -643,4 +643,5 @@ elif page == "Player CRUD":
 #  FOOTER
 # -------------------------------------------------
 st.sidebar.markdown("---")
+
 st.sidebar.caption("Built with Streamlit • Data: Cricbuzz API • DB: PostgreSQL")
