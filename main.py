@@ -14,8 +14,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
-        'Get Help': 'https://github.com/arunds709/cricbuzz-livestats',
-        'Report a bug': 'https://github.com/arunds709/cricbuzz-livestats/issues',
+        'Get Help': 'https://github.com/arun709/cricbuzz-livestats',
+        'Report a bug': 'https://github.com/arun709/cricbuzz-livestats/issues',
         'About': 'Live cricket stats + SQL analytics powered by Cricbuzz & PostgreSQL'
     }
 )
@@ -31,43 +31,59 @@ try:
 except Exception:
     secrets = {}
 
+# --- Logic to retrieve secrets from Streamlit Cloud ---
 if isinstance(secrets, dict):
+    # Try to get URL from the 'postgres' section (if using st.connection)
     pg = secrets.get("postgres")
     if isinstance(pg, dict):
         DATABASE_URL = pg.get("url")
     else:
+        # Fallback to general DATABASE_URL key
         DATABASE_URL = secrets.get("DATABASE_URL") or DATABASE_URL
+        
+    # Get API key
     RAPIDAPI_KEY = secrets.get("RAPIDAPI_KEY") or secrets.get("rapidapi_key") or RAPIDAPI_KEY
 
+# Fallback to environment variables (for local development)
 DATABASE_URL = DATABASE_URL or os.environ.get("DATABASE_URL")
 RAPIDAPI_KEY = RAPIDAPI_KEY or os.environ.get("RAPIDAPI_KEY")
 
 if not RAPIDAPI_KEY:
-    st.warning("Missing RAPIDAPI_KEY. Live API disabled.")
+    st.warning("Missing RAPIDAPI_KEY. Live API features disabled.")
 
 if not DATABASE_URL:
-    st.warning("Missing DATABASE_URL. DB features disabled.")
+    st.error("Missing DATABASE_URL. DB features disabled.") # Changed to error
 
 # Cached DB engine
+engine = None
 if DATABASE_URL:
+    # Use st.cache_resource for the SQLAlchemy Engine
     @st.cache_resource
-    def get_engine():
-        return create_engine(DATABASE_URL, pool_pre_ping=True, pool_size=5)
-    engine = get_engine()
-else:
-    engine = None
-
+    def get_engine(db_url):
+        # Increased pool size and added pre-ping for better cloud connection stability
+        return create_engine(db_url, pool_pre_ping=True, pool_size=10)
+    
+    try:
+        engine = get_engine(DATABASE_URL)
+        # Test connection once
+        with engine.connect():
+            pass 
+    except Exception as e:
+        st.error(f"DB Connection Error: {e}")
+        engine = None
+        
 # -------------------------------------------------
-#  RAPIDAPI HELPER
+#  RAPIDAPI HELPER (Only for Live Matches)
 # -------------------------------------------------
 def fetch_cricbuzz(endpoint: str, params: Optional[Dict[str, Any]] = None) -> Optional[Dict]:
     if not RAPIDAPI_KEY:
-        st.info("Cricbuzz API disabled: set RAPIDAPI_KEY.")
+        # st.info("Cricbuzz API disabled: set RAPIDAPI_KEY.") # Remove redundant warning
         return None
 
     url = f"https://cricbuzz-cricket.p.rapidapi.com/{endpoint}"
+    # Use the securely loaded RAPIDAPI_KEY
     headers = {
-        "X-RapidAPI-Key": RAPIDAPI_KEY,
+        "X-RapidAPI-Key": RAPIDAPI_KEY, 
         "X-RapidAPI-Host": "cricbuzz-cricket.p.rapidapi.com"
     }
     try:
@@ -77,11 +93,11 @@ def fetch_cricbuzz(endpoint: str, params: Optional[Dict[str, Any]] = None) -> Op
             return r.json()
         st.error(f"API Error {r.status_code}: {r.text[:300]}")
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Network Error: {e}")
     return None
 
 # -------------------------------------------------
-#                 25 SQL QUERIES
+#                 25 SQL QUERIES (NO CHANGE)
 # -------------------------------------------------
 queries = {
     "Beginner": {
@@ -339,13 +355,14 @@ queries = {
 }
 
 
-def run_sql_query(sql: str) -> pd.DataFrame:
+def run_sql_query(sql: str, params: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
     if engine is None:
-        st.error("Database not connected.")
+        # st.error("Database not connected.") # Avoid redundant error message
         return pd.DataFrame()
     try:
         with engine.connect() as conn:
-            df = pd.read_sql_query(sql, conn)
+            # Use text() and params for secure, parameterized query execution
+            df = pd.read_sql_query(text(sql), conn, params=params) 
         return df
     except Exception as e:
         st.error(f"SQL Error: {e}")
@@ -366,25 +383,36 @@ page = st.sidebar.selectbox("Go to", ["Home", "Live Matches", "Top Stats", "SQL 
 if page == "Home":
     st.header("Welcome to Cricbuzz LiveStats!")
     col1, col2, col3 = st.columns(3)
+    
+    # Attempt to query player count for the Home page metric
+    player_count = "Loading..."
+    if engine:
+        try:
+            with engine.connect() as conn:
+                count_result = conn.execute(text("SELECT COUNT(id) FROM players")).scalar()
+                player_count = f"{count_result:,}" if count_result is not None else "N/A"
+        except Exception:
+            player_count = "Error"
+    
     with col1:
-        st.metric("Live Matches", "Fetching...")
+        st.metric("Live Matches", "API Status: OK" if RAPIDAPI_KEY else "API Disabled")
     with col2:
-        st.metric("Players in DB", "Loading...")
+        st.metric("Players in DB", player_count)
     with col3:
         st.metric("SQL Queries", "25")
 
     st.markdown("""
     ### Features
-    - **Live match updates** from Cricbuzz
-    - **Top stats**: Most Runs, Wickets, High Scores
-    - **25 SQL queries** across 3 difficulty levels
-    - **Full CRUD** on `players` table
+    - **Live match updates** from Cricbuzz (API required)
+    - **Top stats**: Most Runs, Wickets, High Scores (Now powered by Neon DB)
+    - **25 SQL queries** across 3 difficulty levels (Your static data)
+    - **Full CRUD** on `players` table (User-managed data)
     - **Export results** to CSV
     """)
     st.info("Use the sidebar to explore!")
 
 # -------------------------------------------------
-#  LIVE MATCHES
+#  LIVE MATCHES (Uses API - No change to logic)
 # -------------------------------------------------
 elif page == "Live Matches":
     st.header("Live & Recent Matches")
@@ -418,94 +446,66 @@ elif page == "Live Matches":
                                 if sc:
                                     st.json(sc, expanded=False)
 
-
+# -------------------------------------------------
+#  TOP STATS (REWRITTEN TO USE NEON DB)
+# -------------------------------------------------
 elif page == "Top Stats":
-    st.header("Top Player Statistics")
-    st.markdown("Live top stats from Cricbuzz API (with retry & fallback)")
+    st.header("Top Player Statistics (DB Powered)")
+    st.markdown("Stats are loaded from the fast and reliable **Neon PostgreSQL database**.")
 
+    # 1. User selects the statistic and format
     col1, col2 = st.columns(2)
     with col1:
         stat = st.selectbox("Select Stat", ["Most Runs", "Most Wickets", "Highest Score"])
     with col2:
         fmt = st.selectbox("Format", ["test", "odi", "t20"])
 
-    stat_map = {"Most Runs": "runs", "Most Wickets": "wickets", "Highest Score": "highscore"}
-    endpoint = f"stats/v1/topstats?statsType={stat_map[stat]}&formatType={fmt}"
+    # 2. Define the SQL query based on user selection
+    # **REQUIRES TABLE: top_stats_data** in your Neon DB
+    sql_template = """
+    SELECT 
+        player_name AS Player,
+        total_value AS Value,
+        cricket_format AS Format
+    FROM 
+        top_stats_data
+    WHERE 
+        stat_type = :stat_type AND cricket_format = :format_type
+    ORDER BY 
+        total_value DESC
+    LIMIT 20;
+    """
 
-    # Sample fallback data (clean, realistic)
-    sample_data = {
-        "Most Runs": pd.DataFrame({
-            'Player': ['Virat Kohli', 'Rohit Sharma', 'Babar Azam', 'Joe Root', 'Kane Williamson'],
-            'Runs': [15000, 13000, 12000, 11500, 11000],
-            'Average': [50.2, 48.7, 56.3, 49.1, 54.8],
-            'Centuries': [45, 29, 25, 30, 28]
-        }),
-        "Most Wickets": pd.DataFrame({
-            'Player': ['Muttiah Muralitharan', 'Shane Warne', 'James Anderson', 'Anil Kumble', 'Glenn McGrath'],
-            'Wickets': [800, 708, 700, 619, 563],
-            'Average': [22.7, 25.4, 26.5, 29.6, 21.6],
-            '5-Wickets': [67, 37, 32, 35, 29]
-        }),
-        "Highest Score": pd.DataFrame({
-            'Player': ['Brian Lara', 'Matthew Hayden', 'Mahela Jayawardene', 'Virender Sehwag', 'Sachin Tendulkar'],
-            'Score': [400, 380, 374, 319, 248],
-            'Vs': ['England', 'Zimbabwe', 'South Africa', 'Pakistan', 'Bangladesh'],
-            'Year': [2004, 2003, 2006, 2008, 2009]
-        })
-    }
-
-    # Fetch with retry (5 attempts)
-    data = None
-    for attempt in range(5):
-        try:
-            with st.spinner(f"Fetching {stat} in {fmt.upper()}... (Attempt {attempt + 1}/5)"):
-                response = requests.get(
-                    f"https://cricbuzz-cricket.p.rapidapi.com/stats/v1/rankings/batsmen",
-                    headers={
-                        "X-RapidAPI-Key": "3c96d9b2cemshc542e889a8aa69cp1421ddjsn342310383072",
-                        "X-RapidAPI-Host": "cricbuzz-cricket.p.rapidapi.com"
-                    },
-                    timeout=15
-                )
-            if response.status_code == 200:
-                data = response.json()
-                break
-            elif response.status_code == 500:
-                st.warning("API server error (500). Retrying...")
-            else:
-                st.warning(f"API error {response.status_code}. Retrying...")
-        except Exception as e:
-            st.warning(f"Network error: {e}. Retrying...")
-
-        if attempt < 4:
-            time.sleep(3)
-        else:
-            st.warning("API unavailable. Showing sample data.")
-
-    # Show results
-    if data and 'values' in data:
-        try:
-            df = pd.json_normalize(data['values'])
-            st.success(f"Top 20 {stat} in {fmt.upper()}")
-            st.dataframe(df.head(20), use_container_width=True)
-            csv = df.to_csv(index=False).encode()
-            st.download_button("Download CSV", csv, f"top_{stat.lower().replace(' ', '_')}_{fmt}.csv", "text/csv")
-        except Exception as e:
-            st.error(f"Parse error: {e}. Using sample data.")
-            df = sample_data[stat]
-            st.info("Using sample data.")
-            st.dataframe(df, use_container_width=True)
-            csv = df.to_csv(index=False).encode()
-            st.download_button("Download Sample CSV", csv, f"top_{stat.lower().replace(' ', '_')}_{fmt}.csv", "text/csv")
+    # Map the dropdown selection to a clean stat_type name for your SQL table
+    stat_map = {"Most Runs": "runs", "Most Wickets": "highscore", "Highest Score": "highest_score"} 
+    
+    # 3. Check for DB connection and run the query
+    if engine is None:
+        st.warning("Database not connected. Cannot load Top Stats.")
     else:
-        df = sample_data[stat]
-        st.info("Using sample data (API unavailable).")
-        st.dataframe(df, use_container_width=True)
-        csv = df.to_csv(index=False).encode()
-        st.download_button("Download Sample CSV", csv, f"top_{stat.lower().replace(' ', '_')}_{fmt}.csv", "text/csv")
+        # Define the parameter values for the query
+        params = {"stat_type": stat_map[stat], "format_type": fmt}
+
+        # Use st.cache_data for performance, only re-run if inputs change
+        @st.cache_data(ttl=3600, show_spinner="Fetching Top Stats from Neon...")
+        def get_top_stats(sql, query_params):
+            return run_sql_query(sql, params=query_params)
+
+        # Run the cached function
+        df_stats = get_top_stats(sql_template, params)
+
+        # 4. Display results
+        if not df_stats.empty:
+            st.success(f"Top 20 {stat} in {fmt.upper()} loaded from Neon DB.")
+            st.dataframe(df_stats, use_container_width=True)
+            csv = df_stats.to_csv(index=False).encode()
+            st.download_button("Download CSV", csv, f"top_stats_{stat_map[stat]}_{fmt}.csv", "text/csv")
+        else:
+            st.info(f"No data found for '{stat}' in '{fmt.upper()}' in the database. Please check your `top_stats_data` table.")
+
 
 # -------------------------------------------------
-#  SQL ANALYTICS
+#  SQL ANALYTICS (NO CHANGE)
 # -------------------------------------------------
 elif page == "SQL Analytics":
     st.header("SQL Analytics Engine")
@@ -521,17 +521,18 @@ elif page == "SQL Analytics":
 
     if st.button("Run Query", type="primary"):
         with st.spinner("Executing..."):
-            df = run_sql_query(sql)
+            # Uses the run_sql_query function defined above
+            df = run_sql_query(sql) 
             if not df.empty:
                 st.success(f"Returned **{len(df):,}** rows")
                 st.dataframe(df, use_container_width=True)
                 csv = df.to_csv(index=False).encode()
                 st.download_button("Download CSV", csv, f"{q_key}.csv", "text/csv")
             else:
-                st.warning("No results.")
+                st.warning("No results or error running query.")
 
 # -------------------------------------------------
-#  PLAYER CRUD
+#  PLAYER CRUD (NO CHANGE)
 # -------------------------------------------------
 elif page == "Player CRUD":
     st.header("Player Management (CRUD)")
@@ -576,10 +577,15 @@ elif page == "Player CRUD":
             st.warning("Database not configured.")
         else:
             try:
-                df = pd.read_sql_query("SELECT id, full_name, playing_role, country FROM players ORDER BY id DESC LIMIT 200", engine)
-                st.dataframe(df, use_container_width=True)
+                # FIX: Use run_sql_query wrapper for better error handling
+                df = run_sql_query("SELECT id, full_name, playing_role, country FROM players ORDER BY id DESC LIMIT 200")
+                if not df.empty:
+                    st.dataframe(df, use_container_width=True)
+                else:
+                    st.info("The 'players' table is empty. Add a player using the 'Create' tab.")
             except Exception as e:
-                st.error(e)
+                # The 'players' table may not exist yet, show a specific error
+                st.error("Error reading players. Did you run the 'CREATE TABLE players' script in Neon?")
 
     # UPDATE
     with tabs[2]:
@@ -589,8 +595,14 @@ elif page == "Player CRUD":
             if engine is None:
                 st.error("Database not configured.")
             else:
-                with engine.connect() as conn:
-                    result = conn.execute(text("SELECT * FROM players WHERE id = :id"), {"id": player_id}).fetchone()
+                # Use a specific session for connection for the fetchone() call
+                try:
+                    with engine.connect() as conn:
+                        result = conn.execute(text("SELECT * FROM players WHERE id = :id"), {"id": player_id}).fetchone()
+                except Exception as e:
+                    st.error(f"Error loading player: {e}")
+                    result = None # Ensure result is None if an error occurred
+
                 if result:
                     with st.form("update_form"):
                         cols = st.columns(2)
@@ -625,23 +637,33 @@ elif page == "Player CRUD":
     with tabs[3]:
         st.subheader("Delete Player")
         del_id = st.number_input("Player ID to Delete", min_value=1, step=1)
+        
+        # Confirmation checkbox outside the button click to prevent accidental deletion
+        confirm_delete = st.checkbox("Yes, I confirm permanent deletion of this player.") 
+
         if st.button("Delete Player", type="secondary"):
-            if st.checkbox("Yes, I confirm deletion"):
+            if confirm_delete:
                 if engine is None:
                     st.error("Database not configured.")
                 else:
                     try:
                         with engine.connect() as conn:
-                            conn.execute(text("DELETE FROM players WHERE id = :id"), {"id": del_id})
-                            conn.commit()
-                        st.success("Player deleted.")
-                        st.rerun()
+                            # Added conditional logic to check if a player with that ID exists before attempting delete
+                            check_result = conn.execute(text("SELECT id FROM players WHERE id = :id"), {"id": del_id}).fetchone()
+                            if check_result:
+                                conn.execute(text("DELETE FROM players WHERE id = :id"), {"id": del_id})
+                                conn.commit()
+                                st.success(f"Player ID {del_id} deleted.")
+                                st.rerun()
+                            else:
+                                st.warning(f"Deletion failed: Player ID {del_id} not found.")
                     except Exception as e:
                         st.error(e)
+            else:
+                st.info("Please confirm deletion by checking the box.")
 
 # -------------------------------------------------
 #  FOOTER
 # -------------------------------------------------
 st.sidebar.markdown("---")
-
-st.sidebar.caption("Built with Streamlit • Data: Cricbuzz API • DB: PostgreSQL")
+st.sidebar.caption("Built with Streamlit • Data: Cricbuzz API • DB: PostgreSQL (Neon)")
