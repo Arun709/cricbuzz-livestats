@@ -24,8 +24,6 @@ A **Streamlit-powered web app** that combines **live Cricbuzz API**, **PostgreSQ
 
 **Try it now**: [https://cricbuzz-livestats.streamlit.app](https://cricbuzz-livestats.streamlit.app)
 
-> **Q22 fixed** – No `immutabledict`, no regex errors  
-> **Top Stats fixed** – No 404/500 errors (retry + sample data)
 
 ---
 
@@ -47,4 +45,5 @@ Frontend: Streamlit
 Backend: Python, SQLAlchemy, PostgreSQL
 API: Cricbuzz Cricket (RapidAPI)
 Deployment: Streamlit Cloud
+
 Database: Neon.tech / Local PostgreSQL
