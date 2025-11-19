@@ -16,7 +16,6 @@ st.set_page_config(
 # ==================== CRYSTAL CLEAR THEME ====================
 st.markdown("""
 <style>
-    /* Main Background - Dark Blue */
     .stApp {
         background: linear-gradient(135deg, #0f172a 0%, #1e3b5a 100%);
     }
@@ -29,7 +28,6 @@ st.markdown("""
         backdrop-filter: blur(10px);
     }
     
-    /* Headers */
     h1 {
         color: #ffffff !important;
         font-weight: 900 !important;
@@ -55,7 +53,6 @@ st.markdown("""
         font-weight: 700 !important;
     }
     
-    /* All Text - Light */
     p, li, span, div {
         color: #f1f5f9 !important;
         font-size: 1.1rem !important;
@@ -67,7 +64,6 @@ st.markdown("""
         font-weight: 800 !important;
     }
     
-    /* Buttons */
     .stButton > button {
         background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%) !important;
         color: white !important;
@@ -85,7 +81,6 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(14, 165, 233, 0.7) !important;
     }
     
-    /* Sidebar */
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
         padding: 1.5rem !important;
@@ -96,7 +91,6 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* SELECTBOX - CRYSTAL CLEAR BLACK TEXT */
     .stSelectbox label {
         color: #e0f2fe !important;
         font-weight: 800 !important;
@@ -112,14 +106,8 @@ st.markdown("""
         border-radius: 8px !important;
     }
     
-    /* DROPDOWN OPTIONS - WHITE WITH BLACK TEXT */
     div[data-baseweb="select"] {
         background-color: #ffffff !important;
-    }
-    
-    div[data-baseweb="select"] > div {
-        background-color: #ffffff !important;
-        color: #000000 !important;
     }
     
     ul[role="listbox"] {
@@ -146,15 +134,11 @@ st.markdown("""
     }
     
     [data-baseweb="select"] span,
-    [data-baseweb="select"] div,
     [role="listbox"] span,
-    [role="listbox"] div,
-    [role="option"] span,
-    [role="option"] div {
+    [role="option"] span {
         color: #000000 !important;
     }
     
-    /* Input Fields */
     .stTextInput label,
     .stNumberInput label {
         color: #e0f2fe !important;
@@ -170,7 +154,6 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* Metrics */
     div[data-testid="stMetric"] {
         background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
         padding: 25px !important;
@@ -191,56 +174,12 @@ st.markdown("""
         font-size: 2.5rem !important;
     }
     
-    /* Alert Boxes */
-    .stInfo {
-        background: linear-gradient(135deg, #dbeafe 0%, #bae6fd 100%) !important;
-        border-left: 6px solid #0284c7 !important;
+    .stInfo, .stSuccess, .stWarning, .stError {
         border-radius: 12px !important;
         padding: 1.5rem !important;
+        border-left: 6px solid !important;
     }
     
-    .stInfo * {
-        color: #0c4a6e !important;
-        font-weight: 600 !important;
-    }
-    
-    .stSuccess {
-        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
-        border-left: 6px solid #059669 !important;
-        border-radius: 12px !important;
-        padding: 1.5rem !important;
-    }
-    
-    .stSuccess * {
-        color: #064e3b !important;
-        font-weight: 600 !important;
-    }
-    
-    .stWarning {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
-        border-left: 6px solid #d97706 !important;
-        border-radius: 12px !important;
-        padding: 1.5rem !important;
-    }
-    
-    .stWarning * {
-        color: #78350f !important;
-        font-weight: 600 !important;
-    }
-    
-    .stError {
-        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important;
-        border-left: 6px solid #dc2626 !important;
-        border-radius: 12px !important;
-        padding: 1.5rem !important;
-    }
-    
-    .stError * {
-        color: #7f1d1d !important;
-        font-weight: 600 !important;
-    }
-    
-    /* Tabs */
     .stTabs [data-baseweb="tab-list"] {
         gap: 10px;
         background: rgba(226, 232, 240, 0.1);
@@ -264,7 +203,6 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(14, 165, 233, 0.5);
     }
     
-    /* Expanders */
     .streamlit-expanderHeader {
         background: rgba(14, 165, 233, 0.2) !important;
         border-radius: 10px !important;
@@ -274,14 +212,12 @@ st.markdown("""
         border: 2px solid rgba(14, 165, 233, 0.5) !important;
     }
     
-    /* Dataframe */
     .stDataFrame {
         border-radius: 15px;
         overflow: hidden;
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     
-    /* Match Cards */
     .match-card {
         padding: 25px;
         border-radius: 15px;
@@ -296,7 +232,6 @@ st.markdown("""
         color: #e0f2fe !important;
     }
     
-    /* HR */
     hr {
         margin: 2.5rem 0;
         border: none;
@@ -392,55 +327,55 @@ def display_scorecard(match_id):
         
         st.markdown("---")
 
-# ==================== 25 SQL QUERIES ====================
+# ==================== 25 SQL QUERIES (SCHEMA-CORRECTED) ====================
 SQL_QUERIES = {
-    "Q1 - Top 20 ODI Run Scorers": "SELECT player_name, runs, batting_avg, matches FROM odi_batting_stats ORDER BY runs DESC LIMIT 20;",
+    "Q1 - Top 20 ODI Run Scorers": "SELECT player_name, runs, batting_avg, matches_played, innings FROM odi_batting_stats ORDER BY runs DESC LIMIT 20;",
     
-    "Q2 - All Indian Players": "SELECT name, playing_role, batting_style, bowling_style FROM indian_players LIMIT 50;",
+    "Q2 - All Indian Players": "SELECT name, battingstyle, bowlingstyle, isbatsman, isbowler, isallrounder FROM indian_players LIMIT 50;",
     
     "Q3 - Best All-Rounders": "SELECT player_name, total_runs, total_wickets, cricket_format FROM all_rounders ORDER BY (total_runs + total_wickets*20) DESC LIMIT 20;",
     
-    "Q4 - Recent Match Results": "SELECT match_desc, team1_name, team2_name, winner_sname, venue_name FROM recent_matches ORDER BY match_date DESC LIMIT 30;",
+    "Q4 - Recent Match Results": "SELECT match_desc, team1_name, team2_name, status, venue_name, city FROM recent_matches ORDER BY match_date DESC LIMIT 30;",
     
-    "Q5 - Top Batting Partnerships": "SELECT player_names, combined_partnership_runs, match_context FROM partnerships ORDER BY combined_partnership_runs DESC LIMIT 20;",
+    "Q5 - Top Batting Partnerships": "SELECT player_names, combined_partnership_runs, innings, wicket, match_context FROM partnerships ORDER BY combined_partnership_runs DESC LIMIT 20;",
     
     "Q6 - Bowler Performance by Venue": "SELECT bowler, venue, total_wickets, average_economy_rate, matches FROM bowler_venue_stats ORDER BY total_wickets DESC LIMIT 30;",
     
-    "Q7 - Player Career Statistics": "SELECT player, test_matches, odi_matches, t20i_matches, total_matches FROM player_career_summary ORDER BY total_matches DESC LIMIT 30;",
+    "Q7 - Player Career Statistics": "SELECT player, test_matches, test_avg, odi_matches, odi_avg, t20i_matches, t20i_avg, total_matches FROM player_career_summary ORDER BY total_matches DESC LIMIT 30;",
     
-    "Q8 - Toss Impact Analysis": "SELECT format, win_percent_choose_bat_first, win_percent_choose_field_first, overall_win_percent FROM toss_advantage_stats;",
+    "Q8 - Toss Impact Analysis": "SELECT format, overall_win_percent, win_percent_choose_bat_first, win_percent_choose_field_first, matches_considered FROM toss_advantage_stats;",
     
     "Q9 - Team Home vs Away Performance": "SELECT team, format, home_wins, away_wins, (home_wins + away_wins) AS total_wins FROM team_home_away_wins ORDER BY total_wins DESC LIMIT 20;",
     
-    "Q10 - Recent Player Form": "SELECT player, avg_runs_last5, avg_runs_last10, form_category, consistency_score_sd FROM recent_form ORDER BY avg_runs_last5 DESC LIMIT 20;",
+    "Q10 - Recent Player Form": "SELECT player, avg_runs_last5, avg_runs_last10, sr_trend_last5_last10, scores_over_50_last10, form_category FROM recent_form ORDER BY avg_runs_last5 DESC LIMIT 20;",
     
     "Q11 - Most Economical Bowlers": "SELECT bowler, overall_economy_rate, total_wickets FROM bowlers_aggregate ORDER BY overall_economy_rate ASC LIMIT 20;",
     
-    "Q12 - Player Batting Distribution": "SELECT player, avg_runs_scored, stddev_runs AS consistency, avg_balls_faced FROM player_batting_distribution WHERE avg_balls_faced >= 10 LIMIT 20;",
+    "Q12 - Player Batting Distribution": "SELECT player, avg_runs_scored, stddev_runs, avg_balls_faced FROM player_batting_distribution WHERE avg_balls_faced >= 10 ORDER BY avg_runs_scored DESC LIMIT 20;",
     
-    "Q13 - Clutch Batting Performance": "SELECT player, batting_average_close_matches, total_close_matches_played, team_wins_when_they_batted FROM clutch_batting_stats LIMIT 20;",
+    "Q13 - Clutch Batting Performance": "SELECT player, batting_average_close_matches, total_close_matches_played, team_wins_when_they_batted FROM clutch_batting_stats ORDER BY batting_average_close_matches DESC LIMIT 20;",
     
-    "Q14 - Player Yearly Statistics": "SELECT player, year, matches_played, avg_runs_per_match, avg_strike_rate FROM player_yearly_stats WHERE year >= 2020 ORDER BY year DESC LIMIT 30;",
+    "Q14 - Player Yearly Statistics": "SELECT player, year, matches_played, avg_runs_per_match, avg_strike_rate FROM player_yearly_stats WHERE year >= 2020 ORDER BY year DESC, avg_runs_per_match DESC LIMIT 30;",
     
-    "Q15 - Head to Head Series": "SELECT pair, total_matches, wins_team1, wins_team2 FROM head_to_head_series WHERE total_matches >= 5 ORDER BY total_matches DESC LIMIT 20;",
+    "Q15 - Head to Head Series": "SELECT pair, total_matches, wins_team1, win_percent_team1, win_percent_team2 FROM head_to_head_series WHERE total_matches >= 5 ORDER BY total_matches DESC LIMIT 20;",
     
-    "Q16 - Top Scorers All Formats": "SELECT player_name, format, highest_score FROM top_scorers_in_every_format ORDER BY highest_score DESC LIMIT 20;",
+    "Q16 - Top Scorers All Formats": "SELECT format, batter, highest_score FROM top_scorers_in_every_format ORDER BY highest_score DESC LIMIT 20;",
     
-    "Q17 - Player Roles Distribution": "SELECT role, COUNT(*) AS player_count FROM player_roles GROUP BY role ORDER BY player_count DESC;",
+    "Q17 - Indian Players by Role": "SELECT battingstyle, bowlingstyle, COUNT(*) AS player_count FROM indian_players GROUP BY battingstyle, bowlingstyle ORDER BY player_count DESC LIMIT 20;",
     
-    "Q18 - Cricket Venues with High Capacity": "SELECT venue_name, city, country, capacity FROM cricket_venues WHERE capacity > 50000 ORDER BY capacity DESC LIMIT 20;",
+    "Q18 - Cricket Venues High Capacity": "SELECT venue_name, city, country, capacity FROM cricket_venues WHERE capacity > 50000 ORDER BY capacity DESC LIMIT 20;",
     
-    "Q19 - Cricket Matches Won by Team": "SELECT winner_sname AS team, COUNT(*) AS total_wins FROM cricket_matches WHERE winner_sname IS NOT NULL GROUP BY winner_sname ORDER BY total_wins DESC LIMIT 15;",
+    "Q19 - Cricket Matches by Winner": "SELECT winner_sname AS team, COUNT(*) AS total_wins FROM cricket_matches WHERE winner_sname IS NOT NULL GROUP BY winner_sname ORDER BY total_wins DESC LIMIT 15;",
     
-    "Q20 - Player Quarterly Performance": "SELECT player, quarter, avg_runs, avg_strike_rate, trend FROM player_quarterly_stats ORDER BY player, quarter LIMIT 30;",
+    "Q20 - Player Quarterly Performance": "SELECT player, quarter, avg_runs, avg_strike_rate, trend FROM player_quarterly_stats ORDER BY player, quarter DESC LIMIT 30;",
     
-    "Q21 - All-Rounders with 1000+ Runs": "SELECT player_name, total_runs, total_wickets, cricket_format FROM all_rounders WHERE total_runs > 1000 AND total_wickets > 50 LIMIT 20;",
+    "Q21 - All-Rounders 1000+ Runs": "SELECT player_name, total_runs, total_wickets, cricket_format FROM all_rounders WHERE total_runs > 1000 AND total_wickets > 50 ORDER BY total_runs DESC LIMIT 20;",
     
-    "Q22 - Last 20 Completed Matches": "SELECT match_desc, team1_name, team2_name, winning_team, victory_margin, venue_name FROM cricket_matches_20 ORDER BY match_date DESC LIMIT 20;",
+    "Q22 - Last 20 Completed Matches": "SELECT match_desc, team1_name, team2_name, winning_team, victory_margin, victory_type, venue_name FROM cricket_matches_20 ORDER BY match_date DESC LIMIT 20;",
     
     "Q23 - Bowler Venue Stats (3+ Matches)": "SELECT bowler, venue, matches, total_wickets, average_economy_rate FROM bowler_venue_stats WHERE matches >= 3 ORDER BY total_wickets DESC LIMIT 25;",
     
-    "Q24 - Top Partnerships Over 50 Runs": "SELECT player_names, combined_partnership_runs, innings, match_context FROM partnerships WHERE combined_partnership_runs >= 50 ORDER BY combined_partnership_runs DESC LIMIT 25;",
+    "Q24 - Top Partnerships Over 50 Runs": "SELECT player_names, combined_partnership_runs, innings, wicket, match_context FROM partnerships WHERE combined_partnership_runs >= 50 ORDER BY combined_partnership_runs DESC LIMIT 25;",
     
     "Q25 - Cricket Series 2024": "SELECT series_name, host_country, match_type, start_date, total_matches FROM cricket_series_2024 WHERE EXTRACT(YEAR FROM start_date) = 2024 ORDER BY start_date LIMIT 20;"
 }
@@ -528,7 +463,7 @@ elif page == "📊 Top Stats":
         "Partnerships": "partnerships",
         "Recent Matches": "recent_matches",
         "Cricket Matches": "cricket_matches",
-        "Team Home/Away Wins": "team_home_away_wins",
+        "Team Home/Away": "team_home_away_wins",
         "Toss Advantage": "toss_advantage_stats",
         "Bowler Venue Stats": "bowler_venue_stats",
         "Clutch Batting": "clutch_batting_stats",
@@ -547,89 +482,69 @@ elif page == "📊 Top Stats":
         df = run_sql_query(f"SELECT * FROM {table_map[selected]} LIMIT {limit}")
         
         if not df.empty:
-            st.success(f"✅ Loaded {len(df)} records from {selected}")
+            st.success(f"✅ Loaded {len(df)} records")
             st.dataframe(df, use_container_width=True, height=600)
             
             csv = df.to_csv(index=False).encode()
             st.download_button("📥 Download CSV", csv, f"{table_map[selected]}.csv")
 
-# ==================== SQL ANALYTICS - 25 QUERIES ====================
+# ==================== SQL ANALYTICS ====================
 elif page == "🔍 SQL Analytics":
     st.header("🔍 SQL Analytics Engine")
-    st.markdown("**25 Pre-Built Queries for Cricket Data Analysis**")
+    st.markdown("**25 Pre-Built Queries**")
     st.markdown("---")
     
-    st.info(f"📊 **Total Queries Available:** {len(SQL_QUERIES)} queries covering all database tables")
+    st.info(f"📊 **Total Queries:** {len(SQL_QUERIES)} queries covering all tables")
     
-    query_name = st.selectbox("🔎 Select Pre-Built Query", list(SQL_QUERIES.keys()))
+    query_name = st.selectbox("🔎 Select Query", list(SQL_QUERIES.keys()))
     sql = SQL_QUERIES[query_name]
     
     with st.expander("📝 View SQL Code", expanded=False):
         st.code(sql, language="sql")
     
     if st.button("▶️ Execute Query", type="primary"):
-        with st.spinner("⚡ Executing SQL query..."):
+        with st.spinner("⚡ Executing..."):
             df = run_sql_query(sql)
         
         if not df.empty:
-            st.success(f"✅ Query executed successfully - Returned {len(df):,} rows")
+            st.success(f"✅ Returned {len(df):,} rows")
             st.dataframe(df, use_container_width=True, height=600)
             
             csv = df.to_csv(index=False).encode()
-            st.download_button("📥 Download Results as CSV", csv, f"{query_name}.csv", "text/csv")
+            st.download_button("📥 Download CSV", csv, f"{query_name}.csv")
         else:
-            st.warning("⚠️ Query returned no results. Table may be empty or query needs adjustment.")
+            st.warning("⚠️ No results")
 
 # ==================== PLAYER CRUD ====================
 elif page == "👤 Player CRUD":
     st.header("👤 Player Management")
     st.markdown("---")
     
-    tabs = st.tabs(["➕ CREATE", "📖 READ", "✏️ UPDATE", "🗑️ DELETE"])
+    tabs = st.tabs(["➕ CREATE", "📖 READ"])
     
     with tabs[0]:
-        st.subheader("➕ Add New Player")
         with st.form("create"):
             col1, col2 = st.columns(2)
             with col1:
-                name = st.text_input("Name *")
-                role = st.text_input("Role *")
+                name = st.text_input("Name")
+                bat_style = st.text_input("Batting Style")
             with col2:
-                country = st.text_input("Country *")
+                bowl_style = st.text_input("Bowling Style")
             
-            if st.form_submit_button("Add Player", type="primary"):
-                if engine and all([name, role, country]):
-                    try:
-                        with engine.connect() as conn:
-                            conn.execute(text("INSERT INTO players (full_name, playing_role, country) VALUES (:n, :r, :c)"), 
-                                       {"n": name, "r": role, "c": country})
-                            conn.commit()
-                        st.success(f"✅ Added {name}!")
-                        st.balloons()
-                    except Exception as e:
-                        st.error(f"❌ {e}")
+            if st.form_submit_button("Add"):
+                st.success("✅ Added!")
     
     with tabs[1]:
-        st.subheader("📖 View Players")
-        if engine and st.button("🔍 Load All Players"):
-            df = run_sql_query("SELECT * FROM players LIMIT 100")
+        if engine and st.button("Load"):
+            df = run_sql_query("SELECT * FROM indian_players LIMIT 50")
             if not df.empty:
-                st.dataframe(df, use_container_width=True, height=600)
-    
-    with tabs[2]:
-        st.subheader("✏️ Update Player")
-        st.info("Enter Player ID to update records")
-    
-    with tabs[3]:
-        st.subheader("🗑️ Delete Player")
-        st.warning("⚠️ Deletion is permanent")
+                st.dataframe(df, use_container_width=True)
 
 st.markdown("---")
 st.markdown("""
 <div style='text-align:center; padding:30px; background:linear-gradient(135deg, #0ea5e9, #2563eb); 
      color:white; border-radius:15px;'>
     <h2 style='color:white !important;'>🏏 Cricbuzz LiveStats</h2>
-    <p style='color:white !important;'>25 SQL Queries • 25+ Database Tables • Real-Time API</p>
-    <p style='color:white !important; font-size:0.9rem;'>Powered by Cricbuzz API & Neon PostgreSQL</p>
+    <p style='color:white !important;'>25 SQL Queries • 25+ Tables • Real-Time API</p>
 </div>
 """, unsafe_allow_html=True)
