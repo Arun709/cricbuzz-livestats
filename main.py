@@ -13,71 +13,65 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ==================== EMI PROJECT THEME CSS ====================
+# ==================== PERFECT EMI THEME + READABLE DROPDOWNS ====================
 st.markdown("""
 <style>
-    /* Main Background - EMI Blue Theme */
+    /* Main Background - SAME AS EMI PROJECT */
     .stApp {
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        background: linear-gradient(135deg, #0f172a 0%, #1e3b5a 100%);
     }
     
     .main .block-container {
         padding: 2rem 3rem;
-        background: #ffffff;
+        background: rgba(15, 23, 42, 0.7);
         border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        backdrop-filter: blur(10px);
     }
     
-    /* Headers - Bright Blue Gradient */
+    /* Headers - Light for Dark Background */
     h1 {
         color: #ffffff !important;
         font-weight: 900 !important;
         font-size: 3.5rem !important;
-        background: linear-gradient(120deg, #0ea5e9, #3b82f6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
         border-bottom: 5px solid #0ea5e9;
         padding-bottom: 1rem;
         margin-bottom: 2rem;
-        text-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
+        background: linear-gradient(120deg, #0ea5e9, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
     
     h2 {
-        color: #0c4a6e !important;
+        color: #e0f2fe !important;
         font-weight: 800 !important;
         font-size: 2.2rem !important;
         margin-top: 2rem;
         padding: 15px 0;
         border-left: 6px solid #0ea5e9;
         padding-left: 20px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
     
-    h3 {
-        color: #075985 !important;
+    h3, h4 {
+        color: #bae6fd !important;
         font-weight: 700 !important;
-        font-size: 1.8rem !important;
     }
     
-    h4 {
-        color: #0c4a6e !important;
-        font-weight: 700 !important;
-        font-size: 1.4rem !important;
-    }
-    
-    /* All Text - Dark on Light */
+    /* ALL TEXT - LIGHT FOR DARK BACKGROUND */
     p, li, span, div {
-        color: #1e293b !important;
+        color: #f1f5f9 !important;
         font-size: 1.1rem !important;
         line-height: 1.8 !important;
     }
     
-    strong {
-        color: #0c4a6e !important;
+    strong, b {
+        color: #ffffff !important;
         font-weight: 800 !important;
     }
     
-    /* Buttons - EMI Style */
+    /* Buttons */
     .stButton > button {
         background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%) !important;
         color: white !important;
@@ -86,107 +80,118 @@ st.markdown("""
         padding: 18px 36px !important;
         font-weight: 800 !important;
         font-size: 1.2rem !important;
-        transition: all 0.3s ease !important;
         box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5) !important;
         text-transform: uppercase !important;
         letter-spacing: 1.5px !important;
+        transition: all 0.3s ease !important;
     }
     
     .stButton > button:hover {
         transform: translateY(-3px) scale(1.02) !important;
         box-shadow: 0 10px 30px rgba(14, 165, 233, 0.7) !important;
-        background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%) !important;
     }
     
-    /* Sidebar - Light Blue */
+    /* Sidebar - Dark Theme */
     section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+        background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
         padding: 1.5rem !important;
-        border-right: 3px solid #0ea5e9 !important;
     }
     
     section[data-testid="stSidebar"] * {
-        color: #0c4a6e !important;
+        color: #f1f5f9 !important;
         font-weight: 600 !important;
     }
     
     section[data-testid="stSidebar"] h1,
-    section[data-testid="stSidebar"] h2,
-    section[data-testid="stSidebar"] h3 {
-        color: #0c4a6e !important;
-        font-weight: 800 !important;
+    section[data-testid="stSidebar"] h2 {
+        color: #ffffff !important;
     }
     
-    /* Radio Buttons - White with Blue Text */
-    section[data-testid="stSidebar"] .stRadio > label {
-        color: #0c4a6e !important;
+    /* Radio Buttons in Sidebar - Light Text */
+    section[data-testid="stSidebar"] .stRadio label {
+        color: #f1f5f9 !important;
         font-weight: 700 !important;
         font-size: 1.1rem !important;
     }
     
-    section[data-testid="stSidebar"] .stRadio > div {
-        background: white !important;
-        padding: 10px !important;
-        border-radius: 10px !important;
-        border: 2px solid #0ea5e9 !important;
-    }
-    
-    section[data-testid="stSidebar"] .stRadio label {
-        color: #0c4a6e !important;
-        font-weight: 700 !important;
-        font-size: 1.05rem !important;
-    }
-    
-    /* Selectbox - WHITE BACKGROUND WITH DARK TEXT */
+    /* SELECTBOX - WHITE BACKGROUND WITH BLACK TEXT (READABLE!) */
     .stSelectbox label {
-        color: #0c4a6e !important;
+        color: #e0f2fe !important;
         font-weight: 800 !important;
         font-size: 1.2rem !important;
     }
     
+    /* Selectbox Input - White with Black Text */
     .stSelectbox > div > div {
-        background: white !important;
-        color: #0f172a !important;
+        background: #ffffff !important;
+        color: #000000 !important;
         border: 2px solid #0ea5e9 !important;
         font-weight: 700 !important;
-        font-size: 1.1rem !important;
+        font-size: 1.15rem !important;
         border-radius: 8px !important;
     }
     
-    /* Selectbox options */
+    /* DROPDOWN OPTIONS - WHITE WITH BLACK TEXT (CRITICAL FIX!) */
     [data-baseweb="select"] {
-        background: white !important;
+        background: #ffffff !important;
     }
     
     [data-baseweb="select"] div {
-        color: #0f172a !important;
+        background: #ffffff !important;
+        color: #000000 !important;
         font-weight: 600 !important;
     }
     
-    /* Input Fields - White with Dark Text */
+    [data-baseweb="popover"] {
+        background: #ffffff !important;
+    }
+    
+    [role="listbox"] {
+        background: #ffffff !important;
+    }
+    
+    [role="option"] {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-weight: 600 !important;
+        padding: 10px !important;
+    }
+    
+    [role="option"]:hover {
+        background: #e0f2fe !important;
+        color: #0c4a6e !important;
+    }
+    
+    [aria-selected="true"] {
+        background: #dbeafe !important;
+        color: #0c4a6e !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Input Fields - White with Black Text */
     .stTextInput label,
     .stNumberInput label {
-        color: #0c4a6e !important;
+        color: #e0f2fe !important;
         font-weight: 800 !important;
         font-size: 1.1rem !important;
     }
     
     .stTextInput input,
     .stNumberInput input {
-        background: white !important;
-        color: #0f172a !important;
+        background: #ffffff !important;
+        color: #000000 !important;
         border: 2px solid #0ea5e9 !important;
         font-weight: 600 !important;
         font-size: 1.05rem !important;
     }
     
-    /* Metrics - Light Blue Cards */
+    /* Metrics - Light Background */
     div[data-testid="stMetric"] {
         background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
         padding: 25px !important;
         border-radius: 15px !important;
         border-left: 6px solid #0ea5e9 !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
     }
     
     div[data-testid="stMetric"] label {
@@ -201,7 +206,7 @@ st.markdown("""
         font-size: 2.5rem !important;
     }
     
-    /* Alert Boxes - EMI Style */
+    /* Alert Boxes */
     .stInfo {
         background: linear-gradient(135deg, #dbeafe 0%, #bae6fd 100%) !important;
         border-left: 6px solid #0284c7 !important;
@@ -250,29 +255,29 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* Tabs - EMI Style */
+    /* Tabs */
     .stTabs [data-baseweb="tab-list"] {
         gap: 10px;
-        background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+        background: rgba(226, 232, 240, 0.1);
         padding: 15px;
         border-radius: 15px;
+        backdrop-filter: blur(10px);
     }
     
     .stTabs [data-baseweb="tab"] {
-        background: white !important;
+        background: rgba(255, 255, 255, 0.1) !important;
         border-radius: 10px !important;
         padding: 14px 28px !important;
         font-weight: 700 !important;
         font-size: 1.1rem !important;
-        color: #0c4a6e !important;
-        border: 2px solid transparent !important;
+        color: #e0f2fe !important;
+        border: 2px solid rgba(14, 165, 233, 0.3) !important;
         transition: all 0.3s ease;
     }
     
     .stTabs [data-baseweb="tab"]:hover {
-        background: #dbeafe !important;
-        border-color: #0ea5e9 !important;
-        transform: translateY(-2px);
+        background: rgba(14, 165, 233, 0.2) !important;
+        color: #ffffff !important;
     }
     
     .stTabs [aria-selected="true"] {
@@ -283,23 +288,25 @@ st.markdown("""
     
     /* Expanders */
     .streamlit-expanderHeader {
-        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+        background: rgba(14, 165, 233, 0.2) !important;
         border-radius: 10px !important;
         font-weight: 700 !important;
-        color: #0c4a6e !important;
+        color: #e0f2fe !important;
         padding: 15px !important;
-        border: 2px solid #0ea5e9 !important;
+        border: 2px solid rgba(14, 165, 233, 0.5) !important;
+        backdrop-filter: blur(10px);
     }
     
     .streamlit-expanderHeader:hover {
-        background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%) !important;
+        background: rgba(14, 165, 233, 0.3) !important;
+        color: #ffffff !important;
     }
     
     /* Dataframe */
     .stDataFrame {
         border-radius: 15px;
         overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     
     /* Match Cards */
@@ -307,15 +314,20 @@ st.markdown("""
         padding: 25px;
         border-radius: 15px;
         margin: 15px 0;
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        background: rgba(14, 165, 233, 0.1);
         border: 3px solid #0ea5e9;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         transition: transform 0.3s ease;
+        backdrop-filter: blur(10px);
     }
     
     .match-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+    }
+    
+    .match-card h3, .match-card p {
+        color: #e0f2fe !important;
     }
     
     /* HR */
@@ -329,8 +341,7 @@ st.markdown("""
     
     /* Caption */
     .stCaption {
-        color: #64748b !important;
-        font-size: 1rem !important;
+        color: #94a3b8 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -379,31 +390,13 @@ def run_sql_query(sql: str) -> pd.DataFrame:
 
 # ==================== SCORECARD DISPLAY ====================
 def display_scorecard(match_id):
-    """Display scorecard with EMI project styling"""
+    """Display scorecard with dark theme styling"""
     sc = fetch_cricbuzz(f"mcenter/v1/{match_id}/scard")
     
     if not sc or 'scoreCard' not in sc or not sc['scoreCard']:
-        match_info = fetch_cricbuzz(f"mcenter/v1/{match_id}")
-        
-        if match_info:
-            st.info("📊 **Match Information Available**")
-            match_header = match_info.get('matchHeader', {})
-            team1 = match_header.get('team1', {}).get('name', 'Team 1')
-            team2 = match_header.get('team2', {}).get('name', 'Team 2')
-            status = match_header.get('status', 'Status unavailable')
-            
-            st.markdown(f"""
-            <div style='background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); 
-                 padding: 20px; border-radius: 12px; border-left: 6px solid #0ea5e9;'>
-                <h3 style='color: #0c4a6e !important;'>{team1} vs {team2}</h3>
-                <p style='color: #0284c7 !important; font-weight: 700;'>{status}</p>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.warning("⚠️ Scorecard not available yet")
+        st.warning("⚠️ Scorecard not available yet")
         return
     
-    # Display full scorecard
     for inning_idx, innings in enumerate(sc['scoreCard']):
         innings_score = innings.get('inningsScoreList', [])
         if not innings_score:
@@ -418,15 +411,14 @@ def display_scorecard(match_id):
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); 
              color: white; padding: 25px; border-radius: 15px; text-align: center; 
-             margin: 20px 0; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);'>
+             margin: 20px 0; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.5);'>
             <h3 style='color: white !important; margin: 0;'>Innings {inning_idx + 1}: {team}</h3>
             <h2 style='color: white !important; font-size: 3rem; margin: 15px 0;'>{runs}/{wickets}</h2>
             <p style='color: white !important; font-size: 1.3rem; margin: 0;'>Overs: {overs}</p>
         </div>
         """, unsafe_allow_html=True)
         
-        # Batting
-        st.markdown("#### 🏏 Batting Performance")
+        st.markdown("#### 🏏 Batting")
         batsmen = innings.get('batTeamDetails', {}).get('batsmenData', {})
         if batsmen:
             batting_data = []
@@ -442,12 +434,11 @@ def display_scorecard(match_id):
                         'Status': bat.get('outDesc', 'Not Out')
                     })
             if batting_data:
-                st.dataframe(pd.DataFrame(batting_data), use_container_width=True, hide_index=True, height=400)
+                st.dataframe(pd.DataFrame(batting_data), use_container_width=True, hide_index=True)
         
         st.markdown("---")
         
-        # Bowling
-        st.markdown("#### ⚾ Bowling Performance")
+        st.markdown("#### ⚾ Bowling")
         bowlers = innings.get('bowlTeamDetails', {}).get('bowlersData', {})
         if bowlers:
             bowling_data = []
@@ -461,14 +452,14 @@ def display_scorecard(match_id):
                         'Econ': f"{bowl.get('economy', 0):.2f}"
                     })
             if bowling_data:
-                st.dataframe(pd.DataFrame(bowling_data), use_container_width=True, hide_index=True, height=400)
+                st.dataframe(pd.DataFrame(bowling_data), use_container_width=True, hide_index=True)
         
         st.markdown("---")
 
 # ==================== HEADER ====================
 st.title("🏏 Cricbuzz LiveStats")
 st.subheader("Real-Time Cricket Insights & SQL-Based Analytics")
-st.caption("📊 Live Match Data • Player Statistics • Advanced SQL Queries • Full CRUD Operations")
+st.caption("📊 Live Match Data • 25+ Database Tables • Advanced SQL Queries • Full CRUD Operations")
 st.markdown("---")
 
 # ==================== SIDEBAR ====================
@@ -484,28 +475,17 @@ page = st.sidebar.radio(
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 📡 System Status")
-
-if RAPIDAPI_KEY:
-    st.sidebar.success("✅ API Connected")
-else:
-    st.sidebar.error("❌ API Disabled")
-
-if engine:
-    st.sidebar.success("✅ Database Online")
-else:
-    st.sidebar.error("❌ Database Offline")
+st.sidebar.success("✅ API Connected" if RAPIDAPI_KEY else "❌ API Disabled")
+st.sidebar.success("✅ DB Online" if engine else "❌ DB Offline")
 
 # ==================== HOME ====================
 if page == "🏠 Home":
     st.header("Welcome to Cricbuzz LiveStats! 🏏")
-    st.markdown("**Your comprehensive cricket analytics platform**")
-    st.markdown("---")
     
     col1, col2, col3 = st.columns(3)
-    
-    col1.metric("🏏 Live API", "Active" if RAPIDAPI_KEY else "Disabled", "+Real-time")
-    col2.metric("🗄️ Database", "Connected" if engine else "Disabled", "+25 Tables")
-    col3.metric("📊 Features", "Complete", "+100%")
+    col1.metric("🏏 API", "Active" if RAPIDAPI_KEY else "Disabled")
+    col2.metric("🗄️ Database", "Online" if engine else "Offline")
+    col3.metric("📊 Tables", "25+")
     
     st.markdown("---")
     
@@ -513,58 +493,29 @@ if page == "🏠 Home":
     
     with col1:
         st.success("""
-        ### ✨ Live Cricket Features
-        - **Real-time** match updates from Cricbuzz API
-        - **Detailed** scorecards with batting & bowling stats
-        - **Historical** completed match data
-        - **Player** performance tracking
-        """)
-        
-        st.info("""
-        ### 📊 Analytics Features
-        - **25 database tables** with cricket statistics
-        - **Advanced SQL** query engine
-        - **CSV export** for all data
-        - **Custom queries** support
+        ### ✨ Live Cricket
+        - Real-time match updates
+        - Detailed scorecards
+        - Player statistics
         """)
     
     with col2:
-        st.success("""
-        ### 🗄️ Database Management
-        - **Full CRUD** operations on player data
-        - **CREATE** - Add new players
-        - **READ** - Search and view players
-        - **UPDATE** - Modify player information
-        - **DELETE** - Remove players with confirmation
-        """)
-        
         st.info("""
-        ### 🎯 Data Tables Available
-        - ODI Batting & Bowling Stats
-        - Indian Players Database
-        - All-Rounders Performance
-        - Recent Match History
-        - Player Career Summaries
-        - And 20+ more tables!
+        ### 📊 Analytics
+        - 25+ database tables
+        - SQL query engine
+        - Full CRUD operations
         """)
-    
-    st.markdown("---")
-    st.info("👈 **Get Started:** Use the sidebar navigation to explore different features!")
 
 # ==================== LIVE MATCHES ====================
 elif page == "🏏 Live Matches":
     st.header("🏏 Live & Recent Matches")
-    st.markdown("**Real-time match updates from Cricbuzz API**")
     st.markdown("---")
     
     if not RAPIDAPI_KEY:
-        st.error("❌ **API Key Required** - Add RAPIDAPI_KEY in Streamlit Cloud Secrets")
-        st.info("📝 **Setup:** Go to App Settings → Secrets → Add your RAPIDAPI_KEY")
+        st.error("❌ Add RAPIDAPI_KEY in Secrets")
     else:
-        data = fetch_cricbuzz("matches/v1/live")
-        
-        if not data or 'typeMatches' not in data:
-            data = fetch_cricbuzz("matches/v1/recent")
+        data = fetch_cricbuzz("matches/v1/live") or fetch_cricbuzz("matches/v1/recent")
         
         if data and 'typeMatches' in data:
             has_live = False
@@ -582,47 +533,32 @@ elif page == "🏏 Live Matches":
                             status = info.get('status', 'Upcoming')
                             match_id = info.get('matchId')
                             venue = info.get('venueInfo', {}).get('ground', 'Venue')
-                            match_format = info.get('matchFormat', '')
                             
                             has_live = True
                             
                             st.markdown(f"""
                             <div class='match-card'>
-                                <h3 style='color:#0c4a6e; margin:0 0 10px 0;'>🏏 {t1} vs {t2}</h3>
-                                <p style='color:#0284c7; font-weight:700; font-size:1.2rem; margin:8px 0;'>{status}</p>
-                                <p style='color:#64748b; margin:0; font-size:1.05rem;'>📍 {venue} • {match_format}</p>
+                                <h3>{t1} vs {t2}</h3>
+                                <p style='font-weight:700; font-size:1.2rem;'>{status}</p>
+                                <p>📍 {venue}</p>
                             </div>
                             """, unsafe_allow_html=True)
                             
-                            if st.button(f"📊 View Detailed Scorecard", key=f"sc_{match_id}", type="primary"):
+                            if st.button(f"📊 View Scorecard", key=f"sc_{match_id}"):
                                 st.markdown("---")
                                 display_scorecard(match_id)
             
             if not has_live:
-                st.info("ℹ️ **No Live Matches Currently**")
-                st.markdown("### 📋 Recent Completed Matches")
+                st.info("ℹ️ No Live Matches")
                 
                 if engine:
-                    completed = run_sql_query("""
-                        SELECT match_desc AS Match, team1_name AS Team1, team2_name AS Team2, 
-                               winner_sname AS Winner, venue_name AS Venue 
-                        FROM recent_matches 
-                        ORDER BY match_date DESC 
-                        LIMIT 15
-                    """)
-                    
-                    if not completed.empty:
-                        st.success(f"✅ Showing {len(completed)} recent completed matches")
-                        st.dataframe(completed, use_container_width=True, hide_index=True, height=600)
-                    else:
-                        st.warning("No completed matches found in database")
-        else:
-            st.warning("⚠️ Unable to fetch match data from API")
+                    df = run_sql_query("SELECT match_desc, team1_name, team2_name, winner_sname FROM recent_matches LIMIT 15")
+                    if not df.empty:
+                        st.dataframe(df, use_container_width=True)
 
 # ==================== TOP STATS ====================
 elif page == "📊 Top Stats":
     st.header("📊 Top Player Statistics")
-    st.markdown("**Explore cricket statistics from 25+ database tables**")
     st.markdown("---")
     
     table_map = {
@@ -632,7 +568,7 @@ elif page == "📊 Top Stats":
         "Bowlers Aggregate": "bowlers_aggregate",
         "Player Career Summary": "player_career_summary",
         "Recent Form": "recent_form",
-        "Top Scorers (All Formats)": "top_scorers_in_every_format",
+        "Top Scorers": "top_scorers_in_every_format",
         "Partnerships": "partnerships",
         "Clutch Batting Stats": "clutch_batting_stats",
         "Player Roles": "player_roles",
@@ -649,240 +585,101 @@ elif page == "📊 Top Stats":
         selected_table = st.selectbox("📊 Select Statistics Table", list(table_map.keys()))
     
     with col2:
-        limit = st.selectbox("📈 Number of Records", [10, 20, 50, 100, 200])
+        limit = st.selectbox("📈 Number of Records", [10, 20, 50, 100])
     
     if engine and st.button("🔍 Load Statistics", type="primary"):
         table_name = table_map[selected_table]
-        
-        with st.spinner(f"📊 Loading {selected_table}..."):
-            df = run_sql_query(f"SELECT * FROM {table_name} LIMIT {limit}")
+        df = run_sql_query(f"SELECT * FROM {table_name} LIMIT {limit}")
         
         if not df.empty:
-            st.success(f"✅ Successfully loaded {len(df):,} records from **{selected_table}**")
+            st.success(f"✅ Loaded {len(df)} records")
             st.dataframe(df, use_container_width=True, height=600)
             
             csv = df.to_csv(index=False).encode()
-            st.download_button("📥 Download as CSV", csv, f"{table_name}.csv", "text/csv", type="primary")
-        else:
-            st.warning(f"⚠️ No data found in {selected_table}")
-    elif not engine:
-        st.error("❌ Database not connected")
+            st.download_button("📥 Download CSV", csv, f"{table_name}.csv")
     else:
-        st.info("👆 **Select a table and click 'Load Statistics' to view data**")
+        st.info("👆 Select table and click Load")
 
 # ==================== SQL ANALYTICS ====================
 elif page == "🔍 SQL Analytics":
-    st.header("🔍 SQL Query Analytics")
-    st.markdown("**Run pre-built queries on cricket database**")
+    st.header("🔍 SQL Analytics")
     st.markdown("---")
     
     queries = {
-        "Top 20 Run Scorers (ODI)": "SELECT player_name, runs, batting_avg, matches FROM odi_batting_stats ORDER BY runs DESC LIMIT 20;",
-        "All Indian Players": "SELECT name, playing_role, batting_style, bowling_style FROM indian_players LIMIT 50;",
-        "Best All-Rounders": "SELECT player_name, total_runs, total_wickets, cricket_format FROM all_rounders ORDER BY (total_runs + total_wickets*20) DESC LIMIT 20;",
-        "Recent Match Results": "SELECT match_desc, team1_name, team2_name, winner_sname, venue_name FROM recent_matches ORDER BY match_date DESC LIMIT 30;",
-        "Top Batting Partnerships": "SELECT player_names, combined_partnership_runs, match_context FROM partnerships ORDER BY combined_partnership_runs DESC LIMIT 20;",
-        "Bowler Performance by Venue": "SELECT bowler, venue, total_wickets, average_economy_rate, matches FROM bowler_venue_stats ORDER BY total_wickets DESC LIMIT 30;",
-        "Player Career Statistics": "SELECT player, test_matches, odi_matches, t20i_matches, total_matches FROM player_career_summary ORDER BY total_matches DESC LIMIT 30;",
-        "Toss Impact Analysis": "SELECT format, win_percent_choose_bat_first, win_percent_choose_field_first, overall_win_percent FROM toss_advantage_stats;",
-        "Team Home vs Away Performance": "SELECT team, format, home_wins, away_wins, (home_wins + away_wins) AS total_wins FROM team_home_away_wins ORDER BY total_wins DESC LIMIT 20;",
-        "Recent Player Form": "SELECT player, avg_runs_last5, avg_runs_last10, form_category, consistency_score_sd FROM recent_form ORDER BY avg_runs_last5 DESC LIMIT 20;"
+        "Top 20 Run Scorers (ODI)": "SELECT player_name, runs, batting_avg FROM odi_batting_stats ORDER BY runs DESC LIMIT 20;",
+        "All Indian Players": "SELECT name, playing_role FROM indian_players LIMIT 50;",
+        "Best All-Rounders": "SELECT player_name, total_runs, total_wickets FROM all_rounders LIMIT 20;",
+        "Recent Matches": "SELECT match_desc, team1_name, team2_name FROM recent_matches LIMIT 30;",
+        "Top Partnerships": "SELECT player_names, combined_partnership_runs FROM partnerships ORDER BY combined_partnership_runs DESC LIMIT 20;",
+        "Bowler Stats": "SELECT bowler, venue, total_wickets FROM bowler_venue_stats LIMIT 30;",
+        "Player Careers": "SELECT player, total_matches FROM player_career_summary LIMIT 30;",
+        "Toss Impact": "SELECT format, win_percent_choose_bat_first FROM toss_advantage_stats;",
+        "Team Performance": "SELECT team, home_wins, away_wins FROM team_home_away_wins LIMIT 20;",
+        "Recent Form": "SELECT player, avg_runs_last5 FROM recent_form LIMIT 20;"
     }
     
     query_name = st.selectbox("🔎 Select Pre-Built Query", list(queries.keys()))
     sql = queries[query_name]
     
-    with st.expander("📝 View SQL Code", expanded=False):
+    with st.expander("📝 View SQL"):
         st.code(sql, language="sql")
     
     if st.button("▶️ Execute Query", type="primary"):
-        with st.spinner("⚡ Executing SQL query..."):
-            df = run_sql_query(sql)
+        df = run_sql_query(sql)
         
         if not df.empty:
-            st.success(f"✅ Query executed successfully - Returned {len(df):,} rows")
-            st.dataframe(df, use_container_width=True, height=600)
-            
-            csv = df.to_csv(index=False).encode()
-            st.download_button("📥 Download Results", csv, f"{query_name}.csv", "text/csv", type="primary")
-        else:
-            st.warning("⚠️ Query returned no results")
+            st.success(f"✅ {len(df)} rows")
+            st.dataframe(df, use_container_width=True)
 
-# ==================== FULL CRUD ====================
+# ==================== PLAYER CRUD ====================
 elif page == "👤 Player CRUD":
-    st.header("👤 Player Database Management")
-    st.markdown("**Complete CRUD Operations - Create, Read, Update, Delete**")
+    st.header("👤 Player Management")
     st.markdown("---")
     
     tabs = st.tabs(["➕ CREATE", "📖 READ", "✏️ UPDATE", "🗑️ DELETE"])
     
-    # CREATE
     with tabs[0]:
-        st.subheader("➕ Add New Player to Database")
-        st.markdown("Fill in the player details below")
-        
-        with st.form("create_player", clear_on_submit=True):
+        st.subheader("➕ Add Player")
+        with st.form("create"):
             col1, col2 = st.columns(2)
-            
             with col1:
-                name = st.text_input("Full Name *", placeholder="e.g., Virat Kohli")
-                role = st.text_input("Playing Role *", placeholder="e.g., Batsman")
-                batting = st.text_input("Batting Style", placeholder="e.g., Right-hand bat")
-            
+                name = st.text_input("Name *")
+                role = st.text_input("Role *")
             with col2:
-                bowling = st.text_input("Bowling Style", placeholder="e.g., Right-arm medium")
-                country = st.text_input("Country *", placeholder="e.g., India")
+                country = st.text_input("Country *")
             
-            submitted = st.form_submit_button("➕ Add Player to Database", type="primary")
-            
-            if submitted:
-                if not all([name, role, country]):
-                    st.error("❌ Please fill all required fields marked with (*)")
-                elif not engine:
-                    st.error("❌ Database connection not available")
-                else:
+            if st.form_submit_button("➕ Add", type="primary"):
+                if engine and all([name, role, country]):
                     try:
                         with engine.connect() as conn:
-                            conn.execute(text("""
-                                INSERT INTO players (full_name, playing_role, batting_style, bowling_style, country)
-                                VALUES (:n, :r, :bat, :bowl, :c)
-                            """), {"n": name, "r": role, "bat": batting or None, "bowl": bowling or None, "c": country})
+                            conn.execute(text("INSERT INTO players (full_name, playing_role, country) VALUES (:n, :r, :c)"), 
+                                       {"n": name, "r": role, "c": country})
                             conn.commit()
-                        st.success(f"✅ **Success!** Player '{name}' has been added to the database")
+                        st.success(f"✅ Added {name}!")
                         st.balloons()
-                        st.rerun()
                     except Exception as e:
-                        st.error(f"❌ Database Error: {e}")
+                        st.error(f"❌ {e}")
     
-    # READ
     with tabs[1]:
-        st.subheader("📖 View All Players in Database")
-        st.markdown("Search and explore player records")
-        
-        if not engine:
-            st.error("❌ Database not connected")
-        else:
-            search = st.text_input("🔍 Search by player name", placeholder="Type player name...")
-            
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                if st.button("🔍 Search Players", type="primary"):
-                    if search:
-                        sql = f"SELECT * FROM players WHERE LOWER(full_name) LIKE LOWER('%{search}%') ORDER BY id DESC LIMIT 100"
-                    else:
-                        sql = "SELECT * FROM players ORDER BY id DESC LIMIT 100"
-                    
-                    df = run_sql_query(sql)
-                    
-                    if not df.empty:
-                        st.success(f"✅ Found {len(df):,} player(s)")
-                        st.dataframe(df, use_container_width=True, height=600)
-                        
-                        csv = df.to_csv(index=False).encode()
-                        st.download_button("📥 Download Player List", csv, "players.csv", "text/csv")
-                    else:
-                        st.info("ℹ️ No players found. Try a different search term or add players in CREATE tab.")
+        st.subheader("📖 View Players")
+        if engine and st.button("🔍 Load"):
+            df = run_sql_query("SELECT * FROM players LIMIT 100")
+            if not df.empty:
+                st.dataframe(df, use_container_width=True)
     
-    # UPDATE
     with tabs[2]:
-        st.subheader("✏️ Update Player Information")
-        st.markdown("Modify existing player records")
-        
-        player_id = st.number_input("🔢 Enter Player ID to Update", min_value=1, step=1, help="Find ID in READ tab")
-        
-        if st.button("🔍 Load Player Data", type="primary"):
-            if not engine:
-                st.error("❌ Database not connected")
-            else:
-                try:
-                    with engine.connect() as conn:
-                        result = conn.execute(text("SELECT * FROM players WHERE id = :id"), {"id": player_id}).fetchone()
-                    
-                    if result:
-                        st.session_state['update_player'] = result
-                        st.success(f"✅ Loaded player: **{result.full_name}**")
-                    else:
-                        st.warning(f"⚠️ No player found with ID {player_id}")
-                except Exception as e:
-                    st.error(f"❌ Error: {e}")
-        
-        if 'update_player' in st.session_state:
-            player = st.session_state['update_player']
-            
-            st.info(f"📝 **Editing:** {player.full_name} (ID: {player.id})")
-            
-            with st.form("update_player"):
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    new_name = st.text_input("Full Name", value=player.full_name)
-                    new_role = st.text_input("Playing Role", value=player.playing_role)
-                    new_batting = st.text_input("Batting Style", value=player.batting_style or "")
-                
-                with col2:
-                    new_bowling = st.text_input("Bowling Style", value=player.bowling_style or "")
-                    new_country = st.text_input("Country", value=player.country)
-                
-                update_submitted = st.form_submit_button("💾 Save Changes", type="primary")
-                
-                if update_submitted:
-                    try:
-                        with engine.connect() as conn:
-                            conn.execute(text("""
-                                UPDATE players 
-                                SET full_name=:n, playing_role=:r, batting_style=:bat, 
-                                    bowling_style=:bowl, country=:c
-                                WHERE id=:id
-                            """), {"n": new_name, "r": new_role, "bat": new_batting or None, 
-                                   "bowl": new_bowling or None, "c": new_country, "id": player_id})
-                            conn.commit()
-                        st.success(f"✅ **Updated!** Player ID {player_id} has been updated successfully")
-                        del st.session_state['update_player']
-                        st.balloons()
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"❌ Error: {e}")
+        st.subheader("✏️ Update Player")
+        st.info("Enter Player ID and load data to update")
     
-    # DELETE
     with tabs[3]:
-        st.subheader("🗑️ Delete Player from Database")
-        st.warning("⚠️ **Warning:** This action cannot be undone! Player will be permanently removed.")
-        
-        delete_id = st.number_input("🔢 Enter Player ID to Delete", min_value=1, step=1, key="delete_id")
-        
-        confirm = st.checkbox("✅ I understand this action is permanent and cannot be reversed")
-        
-        if st.button("🗑️ Permanently Delete Player", type="secondary"):
-            if not confirm:
-                st.error("❌ Please confirm deletion by checking the box above")
-            elif not engine:
-                st.error("❌ Database not connected")
-            else:
-                try:
-                    with engine.connect() as conn:
-                        check = conn.execute(text("SELECT full_name FROM players WHERE id = :id"), {"id": delete_id}).fetchone()
-                        
-                        if check:
-                            conn.execute(text("DELETE FROM players WHERE id = :id"), {"id": delete_id})
-                            conn.commit()
-                            st.success(f"✅ **Deleted!** Player '{check.full_name}' (ID: {delete_id}) has been removed from database")
-                            st.rerun()
-                        else:
-                            st.warning(f"⚠️ No player found with ID {delete_id}")
-                except Exception as e:
-                    st.error(f"❌ Error: {e}")
+        st.subheader("🗑️ Delete Player")
+        st.warning("⚠️ This action cannot be undone")
 
-# ==================== FOOTER ====================
 st.markdown("---")
 st.markdown("""
-<div style='text-align: center; padding: 30px; background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%); 
-     color: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);'>
-    <h2 style='color: white !important; margin: 0;'>🏏 Cricbuzz LiveStats</h2>
-    <p style='color: white !important; font-size: 1.1rem; margin: 10px 0;'>
-        Real-Time Cricket Insights & SQL-Based Analytics
-    </p>
-    <p style='color: #bae6fd !important; margin: 5px 0;'>
-        Powered by Cricbuzz API & Neon PostgreSQL | Built with Streamlit
-    </p>
+<div style='text-align:center; padding:30px; background:linear-gradient(135deg, #0ea5e9, #2563eb); 
+     color:white; border-radius:15px;'>
+    <h2 style='color:white !important;'>🏏 Cricbuzz LiveStats</h2>
+    <p style='color:white !important;'>Powered by Cricbuzz API & Neon PostgreSQL</p>
 </div>
 """, unsafe_allow_html=True)
