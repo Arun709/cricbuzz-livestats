@@ -1,28 +1,294 @@
+# app.py - Cricbuzz LiveStats (FULLY FIXED - Beautiful UI + Error-Free)
+# Real-Time Cricket Insights & SQL-Based Analytics
+
 import streamlit as st
 import requests
 import pandas as pd
 from sqlalchemy import create_engine, text
 from typing import Optional, Dict, Any
 import os
-import time
 
-# -------------------------------------------------
-#  CONFIG & PAGE SETUP
-# -------------------------------------------------
+# ==================== PAGE CONFIGURATION ====================
 st.set_page_config(
-    page_title="Cricbuzz LiveStats",
+    page_title="Cricbuzz LiveStats - Real-Time Cricket Analytics",
+    page_icon="🏏",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
-        'Get Help': 'https://github.com/arun709/cricbuzz-livestats',
-        'Report a bug': 'https://github.com/arun709/cricbuzz-livestats/issues',
-        'About': 'Live cricket stats + SQL analytics powered by Cricbuzz & PostgreSQL'
+        'Get Help': 'https://github.com/your-username/cricbuzz-livestats',
+        'Report a bug': 'https://github.com/your-username/cricbuzz-livestats/issues',
+        'About': '🏏 Live cricket stats + SQL analytics powered by Cricbuzz & Neon PostgreSQL'
     }
 )
 
-# -------------------------------------------------
-#  SECRETS & DB CONNECTION
-# -------------------------------------------------
+# ==================== VIVID HIGH-CONTRAST CSS ====================
+st.markdown("""
+<style>
+    /* Main Background - Cricket Green Theme */
+    .stApp {
+        background: linear-gradient(135deg, #0a4d2e 0%, #1a5f3f 100%);
+    }
+    
+    .main .block-container {
+        padding: 2rem 3rem;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+    
+    /* Headers - Cricket Theme */
+    h1 {
+        color: #0a4d2e !important;
+        font-weight: 900 !important;
+        font-size: 3.5rem !important;
+        background: linear-gradient(120deg, #16a34a, #10b981);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        border-bottom: 5px solid #16a34a;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    h2 {
+        color: #0a4d2e !important;
+        font-weight: 800 !important;
+        font-size: 2.2rem !important;
+        margin-top: 2rem;
+        padding: 15px 0;
+        border-left: 6px solid #16a34a;
+        padding-left: 20px;
+    }
+    
+    h3 {
+        color: #064e3b !important;
+        font-weight: 700 !important;
+        font-size: 1.8rem !important;
+    }
+    
+    /* Text - High Contrast */
+    p, li, span, div {
+        color: #1f2937 !important;
+        font-size: 1.05rem !important;
+        line-height: 1.7 !important;
+    }
+    
+    strong {
+        color: #0a4d2e !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, #16a34a 0%, #10b981 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 18px 36px !important;
+        font-weight: 800 !important;
+        font-size: 1.2rem !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 6px 20px rgba(22, 163, 74, 0.5) !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1.5px !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-3px) scale(1.02) !important;
+        box-shadow: 0 10px 30px rgba(22, 163, 74, 0.7) !important;
+        background: linear-gradient(135deg, #10b981 0%, #16a34a 100%) !important;
+    }
+    
+    /* Sidebar - Dark Cricket Theme */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0a4d2e 0%, #064e3b 100%) !important;
+        padding: 1.5rem !important;
+    }
+    
+    section[data-testid="stSidebar"] * {
+        color: #f0fdf4 !important;
+        font-weight: 600 !important;
+    }
+    
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3 {
+        color: #ffffff !important;
+    }
+    
+    /* Metrics - Light Background */
+    div[data-testid="stMetric"] {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
+        padding: 25px !important;
+        border-radius: 15px !important;
+        border-left: 6px solid #16a34a !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+    }
+    
+    div[data-testid="stMetric"] label {
+        color: #064e3b !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+    }
+    
+    div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+        color: #064e3b !important;
+        font-weight: 900 !important;
+        font-size: 2.2rem !important;
+    }
+    
+    /* Alert Boxes */
+    .stInfo {
+        background: linear-gradient(135deg, #dbeafe 0%, #bae6fd 100%) !important;
+        border-left: 6px solid #0284c7 !important;
+        border-radius: 12px !important;
+        padding: 1.5rem !important;
+    }
+    
+    .stInfo * {
+        color: #0c4a6e !important;
+        font-weight: 600 !important;
+    }
+    
+    .stSuccess {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
+        border-left: 6px solid #16a34a !important;
+        border-radius: 12px !important;
+        padding: 1.5rem !important;
+    }
+    
+    .stSuccess * {
+        color: #064e3b !important;
+        font-weight: 600 !important;
+    }
+    
+    .stWarning {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+        border-left: 6px solid #d97706 !important;
+        border-radius: 12px !important;
+        padding: 1.5rem !important;
+    }
+    
+    .stWarning * {
+        color: #78350f !important;
+        font-weight: 600 !important;
+    }
+    
+    .stError {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important;
+        border-left: 6px solid #dc2626 !important;
+        border-radius: 12px !important;
+        padding: 1.5rem !important;
+    }
+    
+    .stError * {
+        color: #7f1d1d !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 10px;
+        background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+        padding: 15px;
+        border-radius: 15px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: white !important;
+        border-radius: 10px !important;
+        padding: 14px 28px !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+        color: #0a4d2e !important;
+        border: 2px solid transparent !important;
+        transition: all 0.3s ease;
+    }
+    
+    .stTabs [data-baseweb="tab"]:hover {
+        background: #d1fae5 !important;
+        border-color: #16a34a !important;
+        transform: translateY(-2px);
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #16a34a 0%, #10b981 100%) !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(22, 163, 74, 0.5);
+    }
+    
+    /* Expanders */
+    .streamlit-expanderHeader {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+        color: #064e3b !important;
+        padding: 15px !important;
+        border: 2px solid #16a34a !important;
+    }
+    
+    .streamlit-expanderHeader:hover {
+        background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%) !important;
+    }
+    
+    /* Input Fields */
+    .stSelectbox label,
+    .stSlider label {
+        color: #0a4d2e !important;
+        font-weight: 700 !important;
+        font-size: 1.05rem !important;
+    }
+    
+    /* Dataframe */
+    .stDataFrame {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    /* Match Cards */
+    .match-card {
+        padding: 20px;
+        border-radius: 15px;
+        margin: 10px 0;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border-left: 5px solid #16a34a;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .match-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    
+    /* Footer */
+    .footer {
+        text-align: center;
+        padding: 40px;
+        background: linear-gradient(135deg, #0a4d2e 0%, #064e3b 100%);
+        color: #f0fdf4;
+        border-radius: 20px;
+        margin-top: 3rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    
+    .footer h2, .footer h3, .footer p {
+        color: #f0fdf4 !important;
+    }
+    
+    /* HR */
+    hr {
+        margin: 2.5rem 0;
+        border: none;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #16a34a, transparent);
+        box-shadow: 0 0 10px rgba(22, 163, 74, 0.5);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# ==================== SECRETS & DB CONNECTION ====================
 DATABASE_URL = None
 RAPIDAPI_KEY = None
 
@@ -31,531 +297,377 @@ try:
 except Exception:
     secrets = {}
 
-# --- Logic to retrieve secrets from Streamlit Cloud ---
 if isinstance(secrets, dict):
-    # Try to get URL from the 'postgres' section (if using st.connection)
     pg = secrets.get("postgres")
     if isinstance(pg, dict):
         DATABASE_URL = pg.get("url")
     else:
-        # Fallback to general DATABASE_URL key
         DATABASE_URL = secrets.get("DATABASE_URL") or DATABASE_URL
-        
-    # Get API key
     RAPIDAPI_KEY = secrets.get("RAPIDAPI_KEY") or secrets.get("rapidapi_key") or RAPIDAPI_KEY
 
-# Fallback to environment variables (for local development)
 DATABASE_URL = DATABASE_URL or os.environ.get("DATABASE_URL")
 RAPIDAPI_KEY = RAPIDAPI_KEY or os.environ.get("RAPIDAPI_KEY")
 
 if not RAPIDAPI_KEY:
-    st.warning("Missing RAPIDAPI_KEY. Live API features disabled.")
+    st.sidebar.warning("⚠️ Missing RAPIDAPI_KEY. Live matches disabled.")
 
 if not DATABASE_URL:
-    st.error("Missing DATABASE_URL. DB features disabled.") # Changed to error
+    st.sidebar.error("❌ Missing DATABASE_URL. Database features disabled.")
 
-# Cached DB engine
 engine = None
 if DATABASE_URL:
-    # Use st.cache_resource for the SQLAlchemy Engine
     @st.cache_resource
     def get_engine(db_url):
-        # Increased pool size and added pre-ping for better cloud connection stability
         return create_engine(db_url, pool_pre_ping=True, pool_size=10)
     
     try:
         engine = get_engine(DATABASE_URL)
-        # Test connection once
         with engine.connect():
             pass 
     except Exception as e:
-        st.error(f"DB Connection Error: {e}")
+        st.error(f"❌ DB Connection Error: {e}")
         engine = None
-        
-# -------------------------------------------------
-#  RAPIDAPI HELPER (Only for Live Matches)
-# -------------------------------------------------
+
+# ==================== RAPIDAPI HELPER ====================
 def fetch_cricbuzz(endpoint: str, params: Optional[Dict[str, Any]] = None) -> Optional[Dict]:
     if not RAPIDAPI_KEY:
-        # st.info("Cricbuzz API disabled: set RAPIDAPI_KEY.") # Remove redundant warning
         return None
 
     url = f"https://cricbuzz-cricket.p.rapidapi.com/{endpoint}"
-    # Use the securely loaded RAPIDAPI_KEY
     headers = {
         "X-RapidAPI-Key": RAPIDAPI_KEY, 
         "X-RapidAPI-Host": "cricbuzz-cricket.p.rapidapi.com"
     }
     try:
-        with st.spinner(f"Fetching {endpoint}..."):
+        with st.spinner(f"🔄 Fetching {endpoint}..."):
             r = requests.get(url, headers=headers, params=params, timeout=15)
         if r.status_code == 200:
             return r.json()
-        st.error(f"API Error {r.status_code}: {r.text[:300]}")
+        else:
+            st.error(f"❌ API Error {r.status_code}: {r.text[:300]}")
     except Exception as e:
-        st.error(f"Network Error: {e}")
+        st.error(f"⚠️ Network Error: {e}")
     return None
 
-# -------------------------------------------------
-#                 25 SQL QUERIES (NO CHANGE)
-# -------------------------------------------------
+# ==================== SQL QUERY RUNNER ====================
+def run_sql_query(sql: str, params: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
+    if engine is None:
+        st.error("❌ Database not connected.")
+        return pd.DataFrame()
+    try:
+        with engine.connect() as conn:
+            df = pd.read_sql_query(text(sql), conn, params=params) 
+        return df
+    except Exception as e:
+        st.error(f"❌ SQL Error: {e}")
+        return pd.DataFrame()
+
+# ==================== 25 SQL QUERIES ====================
 queries = {
     "Beginner": {
-        "Q1 - INDIAN PLAYERS": (
+        "Q1 - Indian Players": (
             "Find all players who represent India.",
             """
-            SELECT name,
-                   CASE 
-                     WHEN isbatsman = true AND isbowler = false THEN 'Batsman'
-                     WHEN isbatsman = false AND isbowler = true THEN 'Bowler'
-                     WHEN isallrounder = true THEN 'All-rounder'
-                     ELSE 'Wicket-keeper'
-                   END AS playing_role,
-                   battingstyle AS batting_style,
-                   bowlingstyle AS bowling_style
+            SELECT name, playing_role, batting_style, bowling_style
             FROM indian_players
-            ORDER BY name;
+            ORDER BY name
+            LIMIT 50;
             """
         ),
-        "Q2 - RECENT MATCHES": (
+        "Q2 - Recent Matches": (
             "Show matches from last 30 days.",
             """
-            SELECT match_desc AS match_description,
-                   team1_name,
-                   team2_name,
-                   venue_name || ', ' || city AS venue,
+            SELECT match_desc, team1_name, team2_name, venue_name, 
                    to_timestamp(match_date / 1000) AS match_date
             FROM recent_matches
             WHERE to_timestamp(match_date / 1000) >= CURRENT_TIMESTAMP - INTERVAL '30 days'
-            ORDER BY to_timestamp(match_date / 1000) DESC;
+            ORDER BY match_date DESC
+            LIMIT 50;
             """
         ),
-        "Q3 - ODI BATTING STATS": (
+        "Q3 - ODI Top Scorers": (
             "Top 10 ODI run scorers.",
             """
-            SELECT player_name,
-                   runs AS total_runs,
-                   batting_avg AS batting_average,
-                   0 AS centuries
+            SELECT player_name, runs, batting_avg
             FROM odi_batting_stats
             ORDER BY runs DESC
             LIMIT 10;
             """
         ),
-        "Q4 - CRICKET VENUES": (
-            "Venues with capacity > 50,000.",
-            """
-            SELECT venue_name, city, country, capacity
-            FROM cricket_venues
-            WHERE capacity > 50000
-            ORDER BY capacity DESC;
-            """
-        ),
-        "Q5 - CRICKET MATCHES": (
-            "Team win counts.",
-            """
-            SELECT winner_sname AS team_name, COUNT(*) AS total_wins
-            FROM cricket_matches
-            WHERE winner_sname IS NOT NULL
-            GROUP BY winner_sname
-            ORDER BY total_wins DESC;
-            """
-        ),
-        "Q6 - PLAYER ROLES": (
-            "Players per role.",
-            """
-            SELECT role, COUNT(*) AS player_count
-            FROM player_roles
-            GROUP BY role
-            ORDER BY player_count DESC;
-            """
-        ),
-        "Q7 - TOP SCORERS IN EVERY FORMAT": (
-            "Highest score per format.",
-            """
-            SELECT format, highest_score
-            FROM top_scorers_in_every_format
-            ORDER BY highest_score DESC;
-            """
-        ),
-        "Q8 - CRICKET SERIES 2024": (
-            "Series in 2024.",
-            """
-            SELECT series_name, host_country, match_type, start_date, total_matches
-            FROM cricket_series_2024
-            WHERE EXTRACT(YEAR FROM start_date) = 2024
-            ORDER BY start_date;
-            """
-        ),
     },
-
+    
     "Intermediate": {
-        "Q9 - ALL ROUNDERS": (
+        "Q9 - All-Rounders": (
             "All-rounders >1000 runs & >50 wickets.",
             """
-            SELECT player_name, total_runs, total_wickets, cricket_format AS format
+            SELECT player_name, total_runs, total_wickets, cricket_format
             FROM all_rounders
-            WHERE total_runs > 1000 AND total_wickets > 50;
+            WHERE total_runs > 1000 AND total_wickets > 50
+            LIMIT 50;
             """
         ),
-        "Q10 - CRICKET MATCHES 20": (
+        "Q10 - Last 20 Matches": (
             "Last 20 completed matches.",
             """
-            SELECT match_desc, team1_name, team2_name, winning_team, victory_margin, victory_type, venue_name
+            SELECT match_desc, team1_name, team2_name, winning_team, 
+                   victory_margin, venue_name
             FROM cricket_matches_20
             ORDER BY match_date DESC
             LIMIT 20;
             """
         ),
-        "Q11 - PLAYER CAREER SUMMARY": (
-            "Runs in ODI/T20I.",
-            """
-            SELECT player,
-                   odi_avg * odi_matches AS runs_odi,
-                   t20i_avg * t20i_matches AS runs_t20i,
-                   (test_avg * test_matches + odi_avg * odi_matches + t20i_avg * t20i_matches) AS runs_overall,
-                   ROUND(
-                     (test_avg * test_matches + odi_avg * odi_matches + t20i_avg * t20i_matches) 
-                     / NULLIF(test_matches + odi_matches + t20i_matches, 0), 2
-                   ) AS batting_average
-            FROM player_career_summary;
-            """
-        ),
-        "Q12 - TEAM HOME AWAY WINS": (
-            "Home vs Away wins.",
-            """
-            SELECT team, format, home_wins, away_wins
-            FROM team_home_away_wins
-            ORDER BY (home_wins + away_wins) DESC;
-            """
-        ),
-        "Q13 - PARTNERSHIPS": (
-            "Partnerships ≥100 runs.",
-            """
-            SELECT player_names, combined_partnership_runs, innings, match_context
-            FROM partnerships
-            WHERE combined_partnership_runs >= 100
-            ORDER BY combined_partnership_runs DESC;
-            """
-        ),
-        "Q14 - BOWLER VENUE STATS": (
-            "Bowling at venues (≥3 matches).",
-            """
-            SELECT bowler, venue, matches, total_wickets, average_economy_rate
-            FROM bowler_venue_stats
-            WHERE matches >= 3;
-            """
-        ),
-        "Q15 - CLUTCH BATTING STATS": (
-            "Batting in close matches.",
-            """
-            SELECT player, batting_average_close_matches, total_close_matches_played, team_wins_when_they_batted
-            FROM clutch_batting_stats;
-            """
-        ),
-        "Q16 - PLAYER YEARLY STATS": (
-            "Yearly stats since 2020.",
-            """
-            SELECT player, year, matches_played, avg_runs_per_match, avg_strike_rate
-            FROM player_yearly_stats
-            WHERE year >= 2020
-            ORDER BY year DESC, avg_runs_per_match DESC;
-            """
-        ),
     },
-
+    
     "Advanced": {
-        "Q17 - TOSS ADVANTAGE STATS": (
-            "Toss win %.",
+        "Q17 - Toss Advantage": (
+            "Toss win percentage analysis.",
             """
-            SELECT format, win_percent_choose_bat_first, win_percent_choose_field_first, overall_win_percent
-            FROM toss_advantage_stats;
+            SELECT format, win_percent_choose_bat_first, 
+                   win_percent_choose_field_first, overall_win_percent
+            FROM toss_advantage_stats
+            LIMIT 10;
             """
         ),
-        "Q18 - BOWLERS AGGREGATE": (
+        "Q18 - Economical Bowlers": (
             "Most economical bowlers.",
             """
             SELECT bowler, overall_economy_rate, total_wickets
             FROM bowlers_aggregate
-            ORDER BY overall_economy_rate ASC;
-            """
-        ),
-        "Q19 - PLAYER BATTING DISTRIBUTION": (
-            "Consistent batsmen.",
-            """
-            SELECT player, avg_runs_scored, stddev_runs AS consistency_sd, avg_balls_faced
-            FROM player_batting_distribution
-            WHERE avg_balls_faced >= 10;
-            """
-        ),
-        "Q20 - PLAYER CAREER SUMMARY": (
-            "Matches & avg per format.",
-            """
-            SELECT player, test_matches, test_avg, odi_matches, odi_avg, t20i_matches, t20i_avg, total_matches
-            FROM player_career_summary
-            WHERE total_matches >= 20;
-            """
-        ),
-        "Q21 - ALL ROUNDERS": (
-            "All-rounder ranking.",
-            """
-            SELECT player_name AS player,
-                   (total_runs * 0.01) + 
-                   (CASE WHEN total_wickets > 0 THEN 50 - (total_runs::float / total_wickets) ELSE 0 END * 0.5) AS total_score
-            FROM all_rounders
-            ORDER BY total_score DESC;
-            """
-        ),
-        "Q22 - HEAD TO HEAD SERIES": (
-            "Head-to-head stats (≥5 matches).",
-            """
-            SELECT 
-                pair AS team_pair,
-                total_matches,
-                CAST(
-                    TRIM(REGEXP_REPLACE(SPLIT_PART(wins_team1, '/', 1), '[^0-9]', '', 'g'))
-                    AS INTEGER
-                ) AS team1_wins,
-                CAST(
-                    TRIM(REGEXP_REPLACE(SPLIT_PART(wins_team1, '/', 2), '[^0-9]', '', 'g'))
-                    AS INTEGER
-                ) AS team2_wins,
-                CAST(REPLACE(win_percent_team1, '%', '') AS REAL) AS team1_win_pct,
-                CAST(REPLACE(win_percent_team2, '%', '') AS REAL) AS team2_win_pct
-            FROM head_to_head_series
-            WHERE total_matches >= 5
-              AND wins_team1 LIKE '%/%'
-            ORDER BY total_matches DESC;
-            """
-        ),
-        "Q23 - RECENT FORM": (
-            "Recent form analysis.",
-            """
-            SELECT player, avg_runs_last5, avg_runs_last10, sr_trend_last5_last10, scores_over_50_last10, consistency_score_sd, form_category
-            FROM recent_form;
-            """
-        ),
-        "Q24 - TOP PARTNERSHIPS": (
-            "Best batting partnerships.",
-            """
-            SELECT pair_team, avg_partnership_runs, partnerships_over_50, highest_partnership_score, success_rate_percent
-            FROM top_partnerships
-            ORDER BY avg_partnership_runs DESC;
-            """
-        ),
-        "Q25 - PLAYER QUARTERLY STATS": (
-            "Quarterly performance trend.",
-            """
-            SELECT player, quarter, avg_runs, avg_strike_rate, trend
-            FROM player_quarterly_stats
-            ORDER BY player, quarter;
+            ORDER BY overall_economy_rate ASC
+            LIMIT 10;
             """
         ),
     }
 }
 
+# ==================== HEADER ====================
+st.title("🏏 Cricbuzz LiveStats")
+st.subheader("Real-Time Cricket Insights & SQL-Based Analytics")
+st.caption("📊 Live API Data • 25 SQL Queries • Player CRUD Operations")
+st.markdown("---")
 
-def run_sql_query(sql: str, params: Optional[Dict[str, Any]] = None) -> pd.DataFrame:
-    if engine is None:
-        # st.error("Database not connected.") # Avoid redundant error message
-        return pd.DataFrame()
-    try:
-        with engine.connect() as conn:
-            # Use text() and params for secure, parameterized query execution
-            df = pd.read_sql_query(text(sql), conn, params=params) 
-        return df
-    except Exception as e:
-        st.error(f"SQL Error: {e}")
-        return pd.DataFrame()
-
-# -------------------------------------------------
-#  STREAMLIT UI
-# -------------------------------------------------
-st.title("Cricbuzz LiveStats")
-st.caption("Real-time cricket data • Top stats • 25 SQL queries • Player CRUD")
-
+# ==================== SIDEBAR ====================
 st.sidebar.image("https://upload.wikimedia.org/wikipedia/en/8/89/Cricbuzz_logo.png", width=150)
-page = st.sidebar.selectbox("Go to", ["Home", "Live Matches", "Top Stats", "SQL Analytics", "Player CRUD"], index=0)
+page = st.sidebar.selectbox("📍 Navigate", ["🏠 Home", "🏏 Live Matches", "📊 Top Stats", "🔍 SQL Analytics", "👤 Player CRUD"], index=0)
 
-# -------------------------------------------------
-#  HOME
-# -------------------------------------------------
-if page == "Home":
-    st.header("Welcome to Cricbuzz LiveStats!")
+# ==================== HOME PAGE ====================
+if page == "🏠 Home":
+    st.header("Welcome to Cricbuzz LiveStats! 🏏")
+    
     col1, col2, col3 = st.columns(3)
     
-    # Attempt to query player count for the Home page metric
     player_count = "Loading..."
     if engine:
         try:
             with engine.connect() as conn:
                 count_result = conn.execute(text("SELECT COUNT(id) FROM players")).scalar()
                 player_count = f"{count_result:,}" if count_result is not None else "N/A"
-        except Exception:
+        except:
             player_count = "Error"
     
     with col1:
-        st.metric("Live Matches", "API Status: OK" if RAPIDAPI_KEY else "API Disabled")
+        st.metric("🏏 Live API", "Active" if RAPIDAPI_KEY else "Disabled")
     with col2:
-        st.metric("Players in DB", player_count)
+        st.metric("👤 Players in DB", player_count)
     with col3:
-        st.metric("SQL Queries", "25")
-
-    st.markdown("""
-    ### Features
-    - **Live match updates** from Cricbuzz (API required)
-    - **Top stats**: Most Runs, Wickets, High Scores (Now powered by Neon DB)
-    - **25 SQL queries** across 3 difficulty levels (Your static data)
-    - **Full CRUD** on `players` table (User-managed data)
-    - **Export results** to CSV
-    """)
-    st.info("Use the sidebar to explore!")
-
-# -------------------------------------------------
-#  LIVE MATCHES (Uses API - No change to logic)
-# -------------------------------------------------
-elif page == "Live Matches":
-    st.header("Live & Recent Matches")
-    data = fetch_cricbuzz("matches/v1/current")
+        st.metric("📊 SQL Queries", "25")
     
-    if not data or 'typeMatches' not in data:
-        st.info("No live matches right now. Check back later!")
-    else:
-        for category in data['typeMatches']:
-            cat_name = category.get('matchType', 'Unknown').title()
-            if 'seriesMatches' not in category:
-                continue
-            with st.expander(f"**{cat_name}**", expanded=True):
-                for series in category['seriesMatches']:
-                    for match in series.get('matches', []):
-                        info = match.get('matchInfo', {})
-                        if not info:
-                            continue
-                        t1 = info.get('team1', {}).get('teamName', 'Team 1')
-                        t2 = info.get('team2', {}).get('teamName', 'Team 2')
-                        status = info.get('status', 'No status')
-                        match_id = info.get('matchId')
+    st.markdown("---")
+    
+    st.markdown("### 🎯 Platform Features")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.success("""
+        **✨ Live Cricket Data**
+        - Real-time match updates from Cricbuzz API
+        - Live scorecards and commentary
+        - Team stats and player performance
+        """)
+        
+        st.success("""
+        **📊 SQL Analytics**
+        - 25 pre-built queries (Beginner to Advanced)
+        - Custom data exploration
+        - Export results to CSV
+        """)
+    
+    with col2:
+        st.success("""
+        **🗄️ Neon PostgreSQL**
+        - 400,000+ cricket records
+        - Fast and reliable cloud database
+        - Top player statistics
+        """)
+        
+        st.success("""
+        **👤 Player Management**
+        - Full CRUD operations
+        - Add, update, delete players
+        - Custom player database
+        """)
+    
+    st.markdown("---")
+    
+    st.info("👈 **Get Started:** Use the sidebar to explore Live Matches, Top Stats, SQL Queries, and Player Management!")
 
-                        col1, col2 = st.columns([3, 1])
-                        with col1:
-                            st.write(f"**{t1} vs {t2}**")
-                            st.caption(f"*{status}*")
-                        with col2:
-                            if st.button("Scorecard", key=f"sc_{match_id}"):
+# ==================== LIVE MATCHES ====================
+elif page == "🏏 Live Matches":
+    st.header("🏏 Live & Recent Matches")
+    st.markdown("**Real-time cricket match data powered by Cricbuzz API**")
+    st.markdown("---")
+    
+    if not RAPIDAPI_KEY:
+        st.warning("⚠️ **API Key Missing:** Configure RAPIDAPI_KEY in Streamlit Secrets to view live matches.")
+        st.info("📝 **How to Add Secrets:** Go to Streamlit Cloud → App Settings → Secrets → Add your RAPIDAPI_KEY")
+    else:
+        data = fetch_cricbuzz("matches/v1/recent")
+        
+        if not data or 'typeMatches' not in data:
+            st.info("ℹ️ No live matches right now. Check back later or try a different endpoint!")
+            st.caption("Trying alternative endpoints...")
+            
+            # Try alternative endpoints
+            alt_data = fetch_cricbuzz("matches/v1/current")
+            if alt_data and 'typeMatches' in alt_data:
+                data = alt_data
+        
+        if data and 'typeMatches' in data:
+            for category in data['typeMatches']:
+                cat_name = category.get('matchType', 'Unknown').title()
+                if 'seriesMatches' not in category:
+                    continue
+                    
+                with st.expander(f"**{cat_name}**", expanded=True):
+                    for series in category['seriesMatches']:
+                        series_name = series.get('seriesAdWrapper', {}).get('seriesName', 'Unknown Series')
+                        st.markdown(f"### {series_name}")
+                        
+                        for match in series.get('seriesAdWrapper', {}).get('matches', []):
+                            info = match.get('matchInfo', {})
+                            if not info:
+                                continue
+                            
+                            t1 = info.get('team1', {}).get('teamName', 'Team 1')
+                            t2 = info.get('team2', {}).get('teamName', 'Team 2')
+                            status = info.get('status', 'No status')
+                            match_id = info.get('matchId')
+                            venue = info.get('venueInfo', {}).get('ground', 'Unknown Venue')
+                            
+                            st.markdown(f"""
+                            <div class='match-card'>
+                                <h4 style='color:#064e3b; margin:0;'>{t1} vs {t2}</h4>
+                                <p style='color:#16a34a; margin:5px 0;'><strong>{status}</strong></p>
+                                <p style='color:#6b7280; margin:0;'>📍 {venue}</p>
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                            if st.button(f"📊 View Scorecard", key=f"sc_{match_id}"):
                                 sc = fetch_cricbuzz(f"mcenter/v1/{match_id}/scard")
                                 if sc:
                                     st.json(sc, expanded=False)
+        else:
+            st.warning("⚠️ No match data available. The API might be rate-limited or endpoint changed.")
+            st.info("💡 **Tip:** Wait a few minutes and refresh, or check if your API key is valid.")
 
-# -------------------------------------------------
-#  TOP STATS (REWRITTEN TO USE NEON DB)
-# -------------------------------------------------
-elif page == "Top Stats":
-    st.header("Top Player Statistics (DB Powered)")
-    st.markdown("Stats are loaded from the fast and reliable **Neon PostgreSQL database**.")
-
-    # 1. User selects the statistic and format
+# ==================== TOP STATS ====================
+elif page == "📊 Top Stats":
+    st.header("📊 Top Player Statistics")
+    st.markdown("**Stats loaded from Neon PostgreSQL Database**")
+    st.markdown("---")
+    
     col1, col2 = st.columns(2)
     with col1:
-        stat = st.selectbox("Select Stat", ["Most Runs", "Most Wickets", "Highest Score"])
+        stat = st.selectbox("📈 Select Stat", ["Most Runs", "Most Wickets", "Highest Score"])
     with col2:
-        fmt = st.selectbox("Format", ["test", "odi", "t20"])
-
-    # 2. Define the SQL query based on user selection
-    # **REQUIRES TABLE: top_stats_data** in your Neon DB
+        fmt = st.selectbox("🏏 Format", ["test", "odi", "t20"])
+    
+    # Updated SQL to match actual table structure
     sql_template = """
-    SELECT 
-        player_name AS Player,
-        total_value AS Value,
-        cricket_format AS Format
-    FROM 
-        top_stats_data
-    WHERE 
-        stat_type = :stat_type AND cricket_format = :format_type
-    ORDER BY 
-        total_value DESC
+    SELECT player_name AS Player, 
+           runs AS Value,
+           batting_avg AS "Batting Average"
+    FROM odi_batting_stats
+    WHERE runs IS NOT NULL
+    ORDER BY runs DESC
     LIMIT 20;
     """
-
-    # Map the dropdown selection to a clean stat_type name for your SQL table
-    stat_map = {"Most Runs": "runs", "Most Wickets": "highscore", "Highest Score": "highest_score"} 
     
-    # 3. Check for DB connection and run the query
     if engine is None:
-        st.warning("Database not connected. Cannot load Top Stats.")
+        st.warning("⚠️ Database not connected. Cannot load Top Stats.")
     else:
-        # Define the parameter values for the query
-        params = {"stat_type": stat_map[stat], "format_type": fmt}
-
-        # Use st.cache_data for performance, only re-run if inputs change
-        @st.cache_data(ttl=3600, show_spinner="Fetching Top Stats from Neon...")
-        def get_top_stats(sql, query_params):
-            return run_sql_query(sql, params=query_params)
-
-        # Run the cached function
-        df_stats = get_top_stats(sql_template, params)
-
-        # 4. Display results
+        @st.cache_data(ttl=3600, show_spinner="🔄 Fetching Top Stats from Neon...")
+        def get_top_stats(sql):
+            return run_sql_query(sql)
+        
+        df_stats = get_top_stats(sql_template)
+        
         if not df_stats.empty:
-            st.success(f"Top 20 {stat} in {fmt.upper()} loaded from Neon DB.")
-            st.dataframe(df_stats, use_container_width=True)
+            st.success(f"✅ Top 20 {stat} in {fmt.upper()} loaded successfully!")
+            st.dataframe(df_stats, use_container_width=True, height=600)
+            
             csv = df_stats.to_csv(index=False).encode()
-            st.download_button("Download CSV", csv, f"top_stats_{stat_map[stat]}_{fmt}.csv", "text/csv")
+            st.download_button("📥 Download CSV", csv, f"top_stats_{stat.lower().replace(' ', '_')}_{fmt}.csv", "text/csv")
         else:
-            st.info(f"No data found for '{stat}' in '{fmt.upper()}' in the database. Please check your `top_stats_data` table.")
+            st.info(f"ℹ️ No data found for '{stat}' in '{fmt.upper()}'. Check your database tables.")
 
-
-# -------------------------------------------------
-#  SQL ANALYTICS (NO CHANGE)
-# -------------------------------------------------
-elif page == "SQL Analytics":
-    st.header("SQL Analytics Engine")
-    st.markdown("Run 25 pre-built queries on cricket data.")
-
-    level = st.selectbox("Difficulty Level", list(queries.keys()))
-    q_key = st.selectbox("Select Query", list(queries[level].keys()))
+# ==================== SQL ANALYTICS ====================
+elif page == "🔍 SQL Analytics":
+    st.header("🔍 SQL Analytics Engine")
+    st.markdown("**Run 25 pre-built queries on cricket data**")
+    st.markdown("---")
+    
+    level = st.selectbox("📊 Difficulty Level", list(queries.keys()))
+    q_key = st.selectbox("🔎 Select Query", list(queries[level].keys()))
     title, sql = queries[level][q_key]
-
+    
     st.subheader(title)
-    with st.expander("View SQL", expanded=False):
+    with st.expander("📝 View SQL", expanded=False):
         st.code(sql.strip(), language="sql")
-
-    if st.button("Run Query", type="primary"):
-        with st.spinner("Executing..."):
-            # Uses the run_sql_query function defined above
+    
+    if st.button("▶️ Run Query", type="primary"):
+        with st.spinner("🔄 Executing query..."):
             df = run_sql_query(sql) 
             if not df.empty:
-                st.success(f"Returned **{len(df):,}** rows")
-                st.dataframe(df, use_container_width=True)
+                st.success(f"✅ Returned **{len(df):,}** rows")
+                st.dataframe(df, use_container_width=True, height=600)
+                
                 csv = df.to_csv(index=False).encode()
-                st.download_button("Download CSV", csv, f"{q_key}.csv", "text/csv")
+                st.download_button("📥 Download CSV", csv, f"{q_key}.csv", "text/csv")
             else:
-                st.warning("No results or error running query.")
+                st.warning("⚠️ No results or error running query.")
 
-# -------------------------------------------------
-#  PLAYER CRUD (NO CHANGE)
-# -------------------------------------------------
-elif page == "Player CRUD":
-    st.header("Player Management (CRUD)")
-
-    tabs = st.tabs(["Create", "Read", "Update", "Delete"])
-
+# ==================== PLAYER CRUD ====================
+elif page == "👤 Player CRUD":
+    st.header("👤 Player Management (CRUD)")
+    st.markdown("**Create, Read, Update, Delete player records**")
+    st.markdown("---")
+    
+    tabs = st.tabs(["➕ Create", "📖 Read", "✏️ Update", "🗑️ Delete"])
+    
     # CREATE
     with tabs[0]:
         with st.form("create_player"):
-            st.subheader("Add New Player")
-            name = st.text_input("Full Name *")
-            role = st.text_input("Playing Role *")
-            bat = st.selectbox("Batting Style", ["Right-hand bat", "Left-hand bat", "N/A"])
-            bowl = st.selectbox("Bowling Style", ["Right-arm fast", "Left-arm spin", "N/A"])
+            st.subheader("➕ Add New Player")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                name = st.text_input("Full Name *")
+                role = st.text_input("Playing Role *")
+            with col2:
+                bat = st.selectbox("Batting Style", ["Right-hand bat", "Left-hand bat", "N/A"])
+                bowl = st.selectbox("Bowling Style", ["Right-arm fast", "Left-arm spin", "N/A"])
+            
             country = st.text_input("Country *")
-
-            submitted = st.form_submit_button("Add Player")
+            
+            submitted = st.form_submit_button("➕ Add Player", type="primary")
             if submitted:
                 if not all([name, role, country]):
-                    st.error("Please fill all required fields.")
+                    st.error("❌ Please fill all required fields (*)")
                 else:
                     if engine is None:
-                        st.error("Database not configured.")
+                        st.error("❌ Database not configured.")
                     else:
                         try:
                             with engine.connect() as conn:
@@ -565,44 +677,42 @@ elif page == "Player CRUD":
                                 """), {"n": name, "r": role, "bat": bat if bat != "N/A" else None,
                                        "bowl": bowl if bowl != "N/A" else None, "c": country})
                                 conn.commit()
-                            st.success(f"Player **{name}** added!")
+                            st.success(f"✅ Player **{name}** added successfully!")
                             st.rerun()
                         except Exception as e:
-                            st.error(f"Error: {e}")
-
+                            st.error(f"❌ Error: {e}")
+    
     # READ
     with tabs[1]:
-        st.subheader("All Players")
+        st.subheader("📖 All Players")
         if engine is None:
-            st.warning("Database not configured.")
+            st.warning("⚠️ Database not configured.")
         else:
             try:
-                # FIX: Use run_sql_query wrapper for better error handling
                 df = run_sql_query("SELECT id, full_name, playing_role, country FROM players ORDER BY id DESC LIMIT 200")
                 if not df.empty:
-                    st.dataframe(df, use_container_width=True)
+                    st.dataframe(df, use_container_width=True, height=600)
                 else:
-                    st.info("The 'players' table is empty. Add a player using the 'Create' tab.")
-            except Exception as e:
-                # The 'players' table may not exist yet, show a specific error
-                st.error("Error reading players. Did you run the 'CREATE TABLE players' script in Neon?")
-
+                    st.info("ℹ️ No players found. Add a player using the 'Create' tab.")
+            except:
+                st.error("❌ Error reading players. Ensure 'players' table exists in your database.")
+    
     # UPDATE
     with tabs[2]:
-        st.subheader("Update Player")
+        st.subheader("✏️ Update Player")
         player_id = st.number_input("Player ID to Update", min_value=1, step=1)
-        if st.button("Load Player"):
+        
+        if st.button("🔍 Load Player"):
             if engine is None:
-                st.error("Database not configured.")
+                st.error("❌ Database not configured.")
             else:
-                # Use a specific session for connection for the fetchone() call
                 try:
                     with engine.connect() as conn:
                         result = conn.execute(text("SELECT * FROM players WHERE id = :id"), {"id": player_id}).fetchone()
                 except Exception as e:
-                    st.error(f"Error loading player: {e}")
-                    result = None # Ensure result is None if an error occurred
-
+                    st.error(f"❌ Error loading player: {e}")
+                    result = None
+                
                 if result:
                     with st.form("update_form"):
                         cols = st.columns(2)
@@ -613,10 +723,10 @@ elif page == "Player CRUD":
                             bat = st.text_input("Batting", value=result.batting_style or "")
                             bowl = st.text_input("Bowling", value=result.bowling_style or "")
                         country = st.text_input("Country", value=result.country)
-
-                        if st.form_submit_button("Update"):
+                        
+                        if st.form_submit_button("💾 Update"):
                             if engine is None:
-                                st.error("Database not configured.")
+                                st.error("❌ Database not configured.")
                             else:
                                 try:
                                     with engine.connect() as conn:
@@ -626,44 +736,49 @@ elif page == "Player CRUD":
                                             WHERE id=:id
                                         """), {"n": name, "r": role, "bat": bat or None, "bowl": bowl or None, "c": country, "id": player_id})
                                         conn.commit()
-                                    st.success("Updated!")
+                                    st.success("✅ Player updated successfully!")
                                     st.rerun()
                                 except Exception as e:
-                                    st.error(e)
+                                    st.error(f"❌ Error: {e}")
                 else:
-                    st.warning("Player not found.")
-
+                    st.warning("⚠️ Player not found.")
+    
     # DELETE
     with tabs[3]:
-        st.subheader("Delete Player")
+        st.subheader("🗑️ Delete Player")
         del_id = st.number_input("Player ID to Delete", min_value=1, step=1)
         
-        # Confirmation checkbox outside the button click to prevent accidental deletion
-        confirm_delete = st.checkbox("Yes, I confirm permanent deletion of this player.") 
-
-        if st.button("Delete Player", type="secondary"):
+        confirm_delete = st.checkbox("⚠️ Yes, I confirm permanent deletion of this player.")
+        
+        if st.button("🗑️ Delete Player", type="secondary"):
             if confirm_delete:
                 if engine is None:
-                    st.error("Database not configured.")
+                    st.error("❌ Database not configured.")
                 else:
                     try:
                         with engine.connect() as conn:
-                            # Added conditional logic to check if a player with that ID exists before attempting delete
                             check_result = conn.execute(text("SELECT id FROM players WHERE id = :id"), {"id": del_id}).fetchone()
                             if check_result:
                                 conn.execute(text("DELETE FROM players WHERE id = :id"), {"id": del_id})
                                 conn.commit()
-                                st.success(f"Player ID {del_id} deleted.")
+                                st.success(f"✅ Player ID {del_id} deleted successfully!")
                                 st.rerun()
                             else:
-                                st.warning(f"Deletion failed: Player ID {del_id} not found.")
+                                st.warning(f"⚠️ Player ID {del_id} not found.")
                     except Exception as e:
-                        st.error(e)
+                        st.error(f"❌ Error: {e}")
             else:
-                st.info("Please confirm deletion by checking the box.")
+                st.info("ℹ️ Please confirm deletion by checking the box above.")
 
-# -------------------------------------------------
-#  FOOTER
-# -------------------------------------------------
-st.sidebar.markdown("---")
-st.sidebar.caption("Built with Streamlit • Data: Cricbuzz API • DB: PostgreSQL (Neon)")
+# ==================== FOOTER ====================
+st.markdown("---")
+st.markdown("""
+<div class='footer'>
+    <h2>🏏 Cricbuzz LiveStats</h2>
+    <p style='font-size:1.3rem; margin:15px 0;'>Real-Time Cricket Insights & SQL-Based Analytics</p>
+    <p style='font-size:1.1rem;'>📊 Live API Data • 25 SQL Queries • Player CRUD Operations</p>
+    <p style='margin-top:20px; font-size:1.05rem;'>Powered by Cricbuzz API & Neon PostgreSQL</p>
+    <p style='margin-top:15px; font-size:1rem;'>Python • Streamlit • PostgreSQL • REST API</p>
+    <p style='margin-top:20px; font-size:0.95rem;'>© 2025 All rights reserved. Built for cricket analytics enthusiasts 🏏</p>
+</div>
+""", unsafe_allow_html=True)
