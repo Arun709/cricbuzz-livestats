@@ -110,10 +110,6 @@ st.markdown("""
         background-color: #ffffff !important;
     }
     
-    div[data-baseweb="popover"] {
-        background-color: #ffffff !important;
-    }
-    
     ul[role="listbox"] {
         background-color: #ffffff !important;
         border: 2px solid #0ea5e9 !important;
@@ -139,26 +135,10 @@ st.markdown("""
         font-weight: 800 !important;
     }
     
-    [data-baseweb="select"] * {
-        color: #000000 !important;
-    }
-    
-    [role="listbox"] * {
-        color: #000000 !important;
-    }
-    
+    [data-baseweb="select"] *,
+    [role="listbox"] *,
     [role="option"] * {
         color: #000000 !important;
-    }
-    
-    div[data-baseweb="select"] span,
-    div[data-baseweb="select"] div,
-    ul[role="listbox"] span,
-    ul[role="listbox"] div,
-    li[role="option"] span,
-    li[role="option"] div {
-        color: #000000 !important;
-        background-color: transparent !important;
     }
     
     .stTextInput label,
@@ -176,7 +156,12 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* METRICS - FIXED WITH DARK TEXT */
+    .stCheckbox label {
+        color: #e0f2fe !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+    }
+    
     div[data-testid="stMetric"] {
         background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
         padding: 25px !important;
@@ -185,21 +170,18 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
     }
     
-    /* METRIC LABEL - DARK BLUE TEXT */
     div[data-testid="stMetric"] label {
         color: #0c4a6e !important;
         font-weight: 800 !important;
         font-size: 1.3rem !important;
     }
     
-    /* METRIC VALUE - DARK BLUE TEXT */
     div[data-testid="stMetric"] [data-testid="stMetricValue"] {
         color: #0c4a6e !important;
         font-weight: 900 !important;
         font-size: 2.8rem !important;
     }
     
-    /* Force all metric children to be dark */
     div[data-testid="stMetric"] * {
         color: #0c4a6e !important;
     }
@@ -401,31 +383,31 @@ def display_scorecard(match_id):
 
 # ==================== 25 SQL QUERIES ====================
 SQL_QUERIES = {
-    "Q1 - Top 20 ODI Run Scorers": "SELECT player_name, runs, batting_avg, matches_played, innings FROM odi_batting_stats ORDER BY runs DESC LIMIT 20;",
-    "Q2 - All Indian Players": "SELECT name, battingstyle, bowlingstyle, isbatsman, isbowler, isallrounder FROM indian_players LIMIT 50;",
-    "Q3 - Best All-Rounders": "SELECT player_name, total_runs, total_wickets, cricket_format FROM all_rounders ORDER BY (total_runs + total_wickets*20) DESC LIMIT 20;",
-    "Q4 - Recent Match Results": "SELECT match_desc, team1_name, team2_name, status, venue_name, city FROM recent_matches ORDER BY match_date DESC LIMIT 30;",
-    "Q5 - Top Batting Partnerships": "SELECT player_names, combined_partnership_runs, innings, wicket, match_context FROM partnerships ORDER BY combined_partnership_runs DESC LIMIT 20;",
-    "Q6 - Bowler Performance by Venue": "SELECT bowler, venue, total_wickets, average_economy_rate, matches FROM bowler_venue_stats ORDER BY total_wickets DESC LIMIT 30;",
-    "Q7 - Player Career Statistics": "SELECT player, test_matches, test_avg, odi_matches, odi_avg, t20i_matches, t20i_avg, total_matches FROM player_career_summary ORDER BY total_matches DESC LIMIT 30;",
-    "Q8 - Toss Impact Analysis": "SELECT format, overall_win_percent, win_percent_choose_bat_first, win_percent_choose_field_first FROM toss_advantage_stats;",
-    "Q9 - Team Home vs Away": "SELECT team, format, home_wins, away_wins FROM team_home_away_wins LIMIT 20;",
-    "Q10 - Recent Player Form": "SELECT player, avg_runs_last5, avg_runs_last10, form_category FROM recent_form ORDER BY avg_runs_last5 DESC LIMIT 20;",
-    "Q11 - Most Economical Bowlers": "SELECT bowler, overall_economy_rate, total_wickets FROM bowlers_aggregate ORDER BY overall_economy_rate ASC LIMIT 20;",
-    "Q12 - Player Batting Distribution": "SELECT player, avg_runs_scored, stddev_runs, avg_balls_faced FROM player_batting_distribution WHERE avg_balls_faced >= 10 LIMIT 20;",
-    "Q13 - Clutch Batting": "SELECT player, batting_average_close_matches, total_close_matches_played FROM clutch_batting_stats LIMIT 20;",
-    "Q14 - Player Yearly Stats": "SELECT player, year, matches_played, avg_runs_per_match FROM player_yearly_stats WHERE year >= 2020 LIMIT 30;",
-    "Q15 - Head to Head Series": "SELECT pair, total_matches, wins_team1 FROM head_to_head_series WHERE total_matches >= 5 LIMIT 20;",
-    "Q16 - Top Scorers All Formats": "SELECT format, batter, highest_score FROM top_scorers_in_every_format LIMIT 20;",
-    "Q17 - Indian Players by Style": "SELECT battingstyle, COUNT(*) AS count FROM indian_players GROUP BY battingstyle LIMIT 20;",
-    "Q18 - High Capacity Venues": "SELECT venue_name, city, capacity FROM cricket_venues WHERE capacity > 50000 LIMIT 20;",
-    "Q19 - Cricket Matches by Winner": "SELECT winner_sname, COUNT(*) AS wins FROM cricket_matches WHERE winner_sname IS NOT NULL GROUP BY winner_sname LIMIT 15;",
-    "Q20 - Player Quarterly Performance": "SELECT player, quarter, avg_runs FROM player_quarterly_stats LIMIT 30;",
-    "Q21 - All-Rounders 1000+ Runs": "SELECT player_name, total_runs, total_wickets FROM all_rounders WHERE total_runs > 1000 LIMIT 20;",
-    "Q22 - Last 20 Matches": "SELECT match_desc, team1_name, team2_name, winning_team FROM cricket_matches_20 LIMIT 20;",
-    "Q23 - Bowler Venue Stats": "SELECT bowler, venue, matches, total_wickets FROM bowler_venue_stats WHERE matches >= 3 LIMIT 25;",
-    "Q24 - Top Partnerships 50+": "SELECT player_names, combined_partnership_runs FROM partnerships WHERE combined_partnership_runs >= 50 LIMIT 25;",
-    "Q25 - Cricket Series 2024": "SELECT series_name, host_country, start_date FROM cricket_series_2024 WHERE EXTRACT(YEAR FROM start_date) = 2024 LIMIT 20;"
+    "Q1 - Top 20 ODI Run Scorers": "SELECT player_name, runs, batting_avg, matches_played FROM odi_batting_stats ORDER BY runs DESC LIMIT 20;",
+    "Q2 - All Indian Players": "SELECT name, battingstyle, bowlingstyle FROM indian_players LIMIT 50;",
+    "Q3 - Best All-Rounders": "SELECT player_name, total_runs, total_wickets FROM all_rounders ORDER BY (total_runs + total_wickets*20) DESC LIMIT 20;",
+    "Q4 - Recent Match Results": "SELECT match_desc, team1_name, team2_name, status FROM recent_matches ORDER BY match_date DESC LIMIT 30;",
+    "Q5 - Top Partnerships": "SELECT player_names, combined_partnership_runs FROM partnerships ORDER BY combined_partnership_runs DESC LIMIT 20;",
+    "Q6 - Bowler by Venue": "SELECT bowler, venue, total_wickets FROM bowler_venue_stats ORDER BY total_wickets DESC LIMIT 30;",
+    "Q7 - Player Career": "SELECT player, test_matches, odi_matches, total_matches FROM player_career_summary LIMIT 30;",
+    "Q8 - Toss Impact": "SELECT format, win_percent_choose_bat_first FROM toss_advantage_stats;",
+    "Q9 - Team Performance": "SELECT team, home_wins, away_wins FROM team_home_away_wins LIMIT 20;",
+    "Q10 - Recent Form": "SELECT player, avg_runs_last5 FROM recent_form LIMIT 20;",
+    "Q11 - Economical Bowlers": "SELECT bowler, overall_economy_rate FROM bowlers_aggregate ORDER BY overall_economy_rate ASC LIMIT 20;",
+    "Q12 - Batting Distribution": "SELECT player, avg_runs_scored FROM player_batting_distribution LIMIT 20;",
+    "Q13 - Clutch Batting": "SELECT player, batting_average_close_matches FROM clutch_batting_stats LIMIT 20;",
+    "Q14 - Yearly Stats": "SELECT player, year, matches_played FROM player_yearly_stats WHERE year >= 2020 LIMIT 30;",
+    "Q15 - Head to Head": "SELECT pair, total_matches FROM head_to_head_series LIMIT 20;",
+    "Q16 - Top Scorers": "SELECT format, batter, highest_score FROM top_scorers_in_every_format LIMIT 20;",
+    "Q17 - Player Styles": "SELECT battingstyle, COUNT(*) FROM indian_players GROUP BY battingstyle LIMIT 20;",
+    "Q18 - High Capacity Venues": "SELECT venue_name, capacity FROM cricket_venues WHERE capacity > 50000 LIMIT 20;",
+    "Q19 - Matches by Winner": "SELECT winner_sname, COUNT(*) FROM cricket_matches WHERE winner_sname IS NOT NULL GROUP BY winner_sname LIMIT 15;",
+    "Q20 - Quarterly Performance": "SELECT player, quarter, avg_runs FROM player_quarterly_stats LIMIT 30;",
+    "Q21 - All-Rounders 1000+": "SELECT player_name, total_runs FROM all_rounders WHERE total_runs > 1000 LIMIT 20;",
+    "Q22 - Last 20 Matches": "SELECT match_desc, team1_name FROM cricket_matches_20 LIMIT 20;",
+    "Q23 - Bowler Venue 3+": "SELECT bowler, venue, matches FROM bowler_venue_stats WHERE matches >= 3 LIMIT 25;",
+    "Q24 - Partnerships 50+": "SELECT player_names, combined_partnership_runs FROM partnerships WHERE combined_partnership_runs >= 50 LIMIT 25;",
+    "Q25 - Series 2024": "SELECT series_name, host_country FROM cricket_series_2024 LIMIT 20;"
 }
 
 # ==================== HEADER ====================
@@ -458,7 +440,7 @@ if page == "🏠 Home":
     
     st.markdown("---")
     st.success("✨ **Live Cricket** - Real-time match updates, detailed scorecards")
-    st.info("📊 **Analytics** - 25 SQL queries, 25+ database tables")
+    st.info("📊 **Analytics** - 25 SQL queries, 25+ database tables, full CRUD operations")
 
 # ==================== LIVE MATCHES ====================
 elif page == "🏏 Live Matches":
@@ -504,12 +486,7 @@ elif page == "📊 Top Stats":
         "Indian Players": "indian_players",
         "All-Rounders": "all_rounders",
         "Bowlers Aggregate": "bowlers_aggregate",
-        "Player Career Summary": "player_career_summary",
-        "Recent Form": "recent_form",
-        "Top Scorers": "top_scorers_in_every_format",
-        "Partnerships": "partnerships",
-        "Recent Matches": "recent_matches",
-        "Cricket Matches": "cricket_matches"
+        "Recent Matches": "recent_matches"
     }
     
     col1, col2 = st.columns(2)
@@ -546,32 +523,168 @@ elif page == "🔍 SQL Analytics":
             st.success(f"✅ {len(df)} rows")
             st.dataframe(df, use_container_width=True, height=600)
 
-# ==================== PLAYER CRUD ====================
+# ==================== FULL PLAYER CRUD ====================
 elif page == "👤 Player CRUD":
-    st.header("👤 Players")
+    st.header("👤 Player Management - Full CRUD Operations")
+    st.markdown("**Create • Read • Update • Delete**")
     st.markdown("---")
     
-    tabs = st.tabs(["➕ CREATE", "📖 READ"])
+    tabs = st.tabs(["➕ CREATE", "📖 READ", "✏️ UPDATE", "🗑️ DELETE"])
     
+    # ==================== CREATE ====================
     with tabs[0]:
-        with st.form("create"):
-            name = st.text_input("Name")
-            style = st.text_input("Style")
+        st.subheader("➕ Add New Player")
+        
+        with st.form("create_player", clear_on_submit=True):
+            col1, col2 = st.columns(2)
             
-            if st.form_submit_button("Add"):
-                st.success("✅ Added!")
+            with col1:
+                name = st.text_input("Player Name *", placeholder="e.g., Virat Kohli")
+                batting = st.text_input("Batting Style", placeholder="e.g., Right-hand bat")
+            
+            with col2:
+                bowling = st.text_input("Bowling Style", placeholder="e.g., Right-arm medium")
+            
+            submitted = st.form_submit_button("➕ Add Player", type="primary")
+            
+            if submitted:
+                if not name:
+                    st.error("❌ Player name is required")
+                elif not engine:
+                    st.error("❌ Database not connected")
+                else:
+                    try:
+                        with engine.connect() as conn:
+                            conn.execute(text("""
+                                INSERT INTO indian_players (name, battingstyle, bowlingstyle)
+                                VALUES (:n, :bat, :bowl)
+                            """), {"n": name, "bat": batting or None, "bowl": bowling or None})
+                            conn.commit()
+                        st.success(f"✅ Player '{name}' added successfully!")
+                        st.balloons()
+                    except Exception as e:
+                        st.error(f"❌ Error: {e}")
     
+    # ==================== READ ====================
     with tabs[1]:
-        if engine and st.button("Load"):
-            df = run_sql_query("SELECT * FROM indian_players LIMIT 50")
-            if not df.empty:
-                st.dataframe(df, use_container_width=True)
+        st.subheader("📖 View All Players")
+        
+        search = st.text_input("🔍 Search by name", placeholder="Type player name...")
+        
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            if st.button("🔍 Load Players", type="primary"):
+                if not engine:
+                    st.error("❌ Database not connected")
+                else:
+                    if search:
+                        sql = f"SELECT * FROM indian_players WHERE LOWER(name) LIKE LOWER('%{search}%') LIMIT 100"
+                    else:
+                        sql = "SELECT * FROM indian_players LIMIT 100"
+                    
+                    df = run_sql_query(sql)
+                    
+                    if not df.empty:
+                        st.success(f"✅ Found {len(df)} player(s)")
+                        st.dataframe(df, use_container_width=True, height=600)
+                        
+                        csv = df.to_csv(index=False).encode()
+                        st.download_button("📥 Download CSV", csv, "players.csv", "text/csv")
+                    else:
+                        st.info("ℹ️ No players found")
+    
+    # ==================== UPDATE ====================
+    with tabs[2]:
+        st.subheader("✏️ Update Player Information")
+        
+        player_id = st.number_input("🔢 Enter Player ID", min_value=1, step=1, help="Find ID in READ tab")
+        
+        if st.button("🔍 Load Player Data", type="primary"):
+            if not engine:
+                st.error("❌ Database not connected")
+            else:
+                try:
+                    with engine.connect() as conn:
+                        result = conn.execute(text("SELECT * FROM indian_players WHERE id = :id"), {"id": player_id}).fetchone()
+                    
+                    if result:
+                        st.session_state['update_player'] = result
+                        st.success(f"✅ Loaded: {result.name}")
+                    else:
+                        st.warning(f"⚠️ No player found with ID {player_id}")
+                except Exception as e:
+                    st.error(f"❌ Error: {e}")
+        
+        if 'update_player' in st.session_state:
+            player = st.session_state['update_player']
+            
+            st.info(f"📝 Editing: {player.name} (ID: {player.id})")
+            
+            with st.form("update_player"):
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    new_name = st.text_input("Player Name", value=player.name)
+                    new_batting = st.text_input("Batting Style", value=player.battingstyle or "")
+                
+                with col2:
+                    new_bowling = st.text_input("Bowling Style", value=player.bowlingstyle or "")
+                
+                update_submitted = st.form_submit_button("💾 Save Changes", type="primary")
+                
+                if update_submitted:
+                    try:
+                        with engine.connect() as conn:
+                            conn.execute(text("""
+                                UPDATE indian_players 
+                                SET name=:n, battingstyle=:bat, bowlingstyle=:bowl
+                                WHERE id=:id
+                            """), {"n": new_name, "bat": new_batting or None, "bowl": new_bowling or None, "id": player_id})
+                            conn.commit()
+                        st.success(f"✅ Player ID {player_id} updated successfully!")
+                        del st.session_state['update_player']
+                        st.balloons()
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"❌ Error: {e}")
+    
+    # ==================== DELETE ====================
+    with tabs[3]:
+        st.subheader("🗑️ Delete Player")
+        st.warning("⚠️ **Warning:** This action cannot be undone!")
+        
+        delete_id = st.number_input("🔢 Enter Player ID to Delete", min_value=1, step=1, key="delete_id")
+        
+        confirm = st.checkbox("✅ I confirm I want to permanently delete this player")
+        
+        if st.button("🗑️ DELETE PLAYER", type="secondary"):
+            if not confirm:
+                st.error("❌ Please confirm deletion by checking the box")
+            elif not engine:
+                st.error("❌ Database not connected")
+            else:
+                try:
+                    with engine.connect() as conn:
+                        # Check if player exists
+                        check = conn.execute(text("SELECT name FROM indian_players WHERE id = :id"), {"id": delete_id}).fetchone()
+                        
+                        if check:
+                            conn.execute(text("DELETE FROM indian_players WHERE id = :id"), {"id": delete_id})
+                            conn.commit()
+                            st.success(f"✅ Player '{check.name}' (ID: {delete_id}) deleted successfully!")
+                            st.rerun()
+                        else:
+                            st.warning(f"⚠️ No player found with ID {delete_id}")
+                except Exception as e:
+                    st.error(f"❌ Error: {e}")
 
+# ==================== FOOTER ====================
 st.markdown("---")
 st.markdown("""
 <div style='text-align:center; padding:30px; background:linear-gradient(135deg, #0ea5e9, #2563eb); 
      color:white; border-radius:15px;'>
     <h2 style='color:white !important;'>🏏 Cricbuzz LiveStats</h2>
-    <p style='color:white !important;'>25 Queries • 25+ Tables • Real-Time API</p>
+    <p style='color:white !important;'>25 Queries • 25+ Tables • Full CRUD • Real-Time API</p>
 </div>
 """, unsafe_allow_html=True)
