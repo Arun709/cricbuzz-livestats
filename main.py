@@ -91,14 +91,12 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* SELECTBOX LABEL - Light Color */
     .stSelectbox label {
         color: #e0f2fe !important;
         font-weight: 800 !important;
         font-size: 1.2rem !important;
     }
     
-    /* SELECTBOX INPUT - White with Black Text */
     .stSelectbox > div > div {
         background: #ffffff !important;
         color: #000000 !important;
@@ -108,29 +106,20 @@ st.markdown("""
         border-radius: 8px !important;
     }
     
-    /* Force all selectbox text to be black */
-    .stSelectbox div[data-baseweb="select"] > div {
-        color: #000000 !important;
-    }
-    
-    /* DROPDOWN CONTAINER - White Background */
     div[data-baseweb="select"] {
         background-color: #ffffff !important;
     }
     
-    /* DROPDOWN MENU - White Background */
     div[data-baseweb="popover"] {
         background-color: #ffffff !important;
     }
     
-    /* LISTBOX - White Background */
     ul[role="listbox"] {
         background-color: #ffffff !important;
         border: 2px solid #0ea5e9 !important;
         border-radius: 8px !important;
     }
     
-    /* OPTIONS - BLACK TEXT ON WHITE (CRITICAL FIX!) */
     li[role="option"] {
         background-color: #ffffff !important;
         color: #000000 !important;
@@ -150,7 +139,6 @@ st.markdown("""
         font-weight: 800 !important;
     }
     
-    /* Force ALL nested elements in dropdown to be black */
     [data-baseweb="select"] * {
         color: #000000 !important;
     }
@@ -163,7 +151,6 @@ st.markdown("""
         color: #000000 !important;
     }
     
-    /* Override any inherited white text */
     div[data-baseweb="select"] span,
     div[data-baseweb="select"] div,
     ul[role="listbox"] span,
@@ -174,7 +161,6 @@ st.markdown("""
         background-color: transparent !important;
     }
     
-    /* Input Fields */
     .stTextInput label,
     .stNumberInput label {
         color: #e0f2fe !important;
@@ -190,7 +176,7 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* Metrics */
+    /* METRICS - FIXED WITH DARK TEXT */
     div[data-testid="stMetric"] {
         background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
         padding: 25px !important;
@@ -199,19 +185,25 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
     }
     
+    /* METRIC LABEL - DARK BLUE TEXT */
     div[data-testid="stMetric"] label {
         color: #0c4a6e !important;
-        font-weight: 700 !important;
-        font-size: 1.2rem !important;
+        font-weight: 800 !important;
+        font-size: 1.3rem !important;
     }
     
+    /* METRIC VALUE - DARK BLUE TEXT */
     div[data-testid="stMetric"] [data-testid="stMetricValue"] {
         color: #0c4a6e !important;
         font-weight: 900 !important;
-        font-size: 2.5rem !important;
+        font-size: 2.8rem !important;
     }
     
-    /* Alert Boxes */
+    /* Force all metric children to be dark */
+    div[data-testid="stMetric"] * {
+        color: #0c4a6e !important;
+    }
+    
     .stInfo {
         background: linear-gradient(135deg, #dbeafe 0%, #bae6fd 100%) !important;
         border-left: 6px solid #0284c7 !important;
@@ -260,7 +252,6 @@ st.markdown("""
         font-weight: 600 !important;
     }
     
-    /* Tabs */
     .stTabs [data-baseweb="tab-list"] {
         gap: 10px;
         background: rgba(226, 232, 240, 0.1);
@@ -284,7 +275,6 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(14, 165, 233, 0.5);
     }
     
-    /* Expanders */
     .streamlit-expanderHeader {
         background: rgba(14, 165, 233, 0.2) !important;
         border-radius: 10px !important;
@@ -294,14 +284,12 @@ st.markdown("""
         border: 2px solid rgba(14, 165, 233, 0.5) !important;
     }
     
-    /* Dataframe */
     .stDataFrame {
         border-radius: 15px;
         overflow: hidden;
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     
-    /* Match Cards */
     .match-card {
         padding: 25px;
         border-radius: 15px;
@@ -316,7 +304,6 @@ st.markdown("""
         color: #e0f2fe !important;
     }
     
-    /* HR */
     hr {
         margin: 2.5rem 0;
         border: none;
@@ -465,9 +452,9 @@ if page == "🏠 Home":
     st.header("Welcome! 🏏")
     
     col1, col2, col3 = st.columns(3)
-    col1.metric("API", "Active" if RAPIDAPI_KEY else "Disabled")
-    col2.metric("Database", "Online" if engine else "Offline")
-    col3.metric("SQL Queries", "25")
+    col1.metric("🏏 API", "Active" if RAPIDAPI_KEY else "Disabled")
+    col2.metric("🗄️ Database", "Online" if engine else "Offline")
+    col3.metric("📊 SQL Queries", "25")
     
     st.markdown("---")
     st.success("✨ **Live Cricket** - Real-time match updates, detailed scorecards")
