@@ -1,6 +1,14 @@
-cricbuzz-livestats/
-├── main.py                 # Core app (Streamlit + SQL + API)
-├── requirements.txt        # Dependencies
+CricbuzzLiveStats/
+│
+├── main.py                     # Main starter file (config, sidebar, global CSS)
+├── utils.py                   # Shared helpers: API, SQL, formats, engine, secrets
+├── requirements.txt           # Python package requirements (use 'pip freeze' or manually write needed packages)
 ├── .streamlit/
-│   └── secrets.toml        # API key & DB URL
-├── README.md               
+│   └── secrets.toml           
+│
+└── pages/
+    ├── 1_Home.py
+    ├── 2_Live_Matches.py
+    ├── 3_Top_Stats.py
+    ├── 4_SQL_Analysis.py
+    └── 5_CRUD_Operations.py
