@@ -667,7 +667,7 @@ elif page == "👥 Player CRUD":
                                     st.error(f"❌ Player ID {player_id} already exists! Choose a different ID or leave blank for auto-generate.")
                                 else:
                                     # Insert with custom ID
-                                    conn.execute(
+                                    result = conn.execute(
                                         text("INSERT INTO indian_players (id, name, battingstyle, bowlingstyle) VALUES (:id, :n, :bat, :bowl)"),
                                         {"id": player_id, "n": name.strip(), "bat": batting.strip() or None, "bowl": bowling.strip() or None}
                                     )
@@ -675,13 +675,17 @@ elif page == "👥 Player CRUD":
                                     st.success(f"✅ Player '{name}' added successfully with ID: {player_id}!")
                                     st.balloons()
                             else:
-                                # Auto-generate ID
-                                conn.execute(
-                                    text("INSERT INTO indian_players (name, battingstyle, bowlingstyle) VALUES (:n, :bat, :bowl)"),
-                                    {"n": name.strip(), "bat": batting.strip() or None, "bowl": bowling.strip() or None}
+                                # Auto-generate ID - Get the next available ID
+                                max_id_result = conn.execute(text("SELECT COALESCE(MAX(id), 0) + 1 as next_id FROM indian_players")).fetchone()
+                                next_id = max_id_result[0]
+                                
+                                # Insert with generated ID
+                                result = conn.execute(
+                                    text("INSERT INTO indian_players (id, name, battingstyle, bowlingstyle) VALUES (:id, :n, :bat, :bowl)"),
+                                    {"id": next_id, "n": name.strip(), "bat": batting.strip() or None, "bowl": bowling.strip() or None}
                                 )
                                 conn.commit()
-                                st.success(f"✅ Player '{name}' added successfully with auto-generated ID!")
+                                st.success(f"✅ Player '{name}' added successfully with ID: {next_id}!")
                                 st.balloons()
                                 
                     except Exception as e:
