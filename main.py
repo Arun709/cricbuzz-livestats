@@ -9,7 +9,7 @@ import os
 # ==================== PAGE CONFIGURATION ====================
 st.set_page_config(
     page_title="Cricbuzz LiveStats",
-    page_icon="cricket ball",
+    page_icon="🏏",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -17,6 +17,11 @@ st.set_page_config(
 # ==================== PERFECT READABLE CSS  ====================
 st.markdown("""
 <style>
+    /* Hide Streamlit's default menu */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
     .stApp {
         background: linear-gradient(135deg, #0f172a 0%, #1e3b5a 100%);
     }
@@ -304,6 +309,19 @@ st.markdown("""
         height: 3px;
         background: linear-gradient(90deg, transparent, #0ea5e9, transparent);
     }
+    
+    /* Radio button styling for sidebar */
+    .stRadio > label {
+        color: #e0f2fe !important;
+        font-weight: 800 !important;
+        font-size: 1.2rem !important;
+    }
+    
+    .stRadio > div {
+        background: rgba(14, 165, 233, 0.1);
+        padding: 10px;
+        border-radius: 10px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -382,54 +400,60 @@ SQL_QUERIES = {
     "Q25 - Series 2024": "SELECT series_name, host_country FROM cricket_series_2024 LIMIT 20;"
 }
 
-# ==================== HEADER & SIDEBAR ====================
-st.title("Cricbuzz LiveStats")
+# ==================== HEADER & SIDEBAR - SINGLE MENU ====================
+st.title("🏏 Cricbuzz LiveStats")
 st.subheader("Real-Time Cricket Insights & SQL-Based Analytics")
 st.markdown("---")
 
-st.sidebar.title("Navigation")
+# SIDEBAR - SINGLE NAVIGATION
+st.sidebar.title("📊 Navigation")
 st.sidebar.markdown("---")
+
+# Single menu using radio buttons
 page = st.sidebar.radio(
-    "Pages",
-    ["Home", "Live Matches", "Top Stats", "SQL Analytics", "Player CRUD"],
-    label_visibility="collapsed"
+    "Choose a page:",
+    ["🏠 Home", "🔴 Live Matches", "📈 Top Stats", "💻 SQL Analytics", "👥 Player CRUD"],
+    index=0
 )
+
 st.sidebar.markdown("---")
-st.sidebar.success("API" if RAPIDAPI_KEY else "API")
-st.sidebar.success("DB" if engine else "DB")
+st.sidebar.markdown("### System Status")
+st.sidebar.success("✅ API Connected" if RAPIDAPI_KEY else "❌ API Disconnected")
+st.sidebar.success("✅ Database Online" if engine else "❌ Database Offline")
 
 # ==================== HOME ====================
-if page == "Home":
-    st.header("Welcome!")
+if page == "🏠 Home":
+    st.header("Welcome to Cricbuzz LiveStats!")
     col1, col2, col3 = st.columns(3)
-    col1.metric("API", "Active" if RAPIDAPI_KEY else "Disabled")
-    col2.metric("Database", "Online" if engine else "Offline")
+    col1.metric("API Status", "🟢 Active" if RAPIDAPI_KEY else "🔴 Disabled")
+    col2.metric("Database", "🟢 Online" if engine else "🔴 Offline")
     col3.metric("SQL Queries", "25")
     st.markdown("---")
-    st.success("**Live Cricket** - Real-time match updates, detailed scorecards")
-    st.info("**Analytics** - 25 SQL queries, 25+ database tables, full CRUD operations")
+    st.success("**📺 Live Cricket** - Real-time match updates, detailed scorecards, live scores")
+    st.info("**📊 Analytics** - 25 SQL queries, 25+ database tables, full CRUD operations")
+    st.warning("**⚡ Performance** - Fast queries, real-time data, responsive UI")
 
 # ==================== LIVE MATCHES ====================
-elif page == "Live Matches":
-    st.header("Live Cricket Matches")
+elif page == "🔴 Live Matches":
+    st.header("🔴 Live Cricket Matches")
     st.markdown("---")
 
     if not RAPIDAPI_KEY:
-        st.error("Add RAPIDAPI_KEY in Streamlit Secrets")
+        st.error("❌ Add RAPIDAPI_KEY in Streamlit Secrets to view live matches")
         st.stop()
 
     data = fetch_cricbuzz("matches/v1/live")
     if not data or "typeMatches" not in data:
-        st.warning("No live matches. Showing recent...")
+        st.warning("⚠️ No live matches currently. Showing recent matches...")
         data = fetch_cricbuzz("matches/v1/recent")
 
     if not data:
-        st.error("Failed to fetch matches")
+        st.error("❌ Failed to fetch matches from API")
         st.stop()
 
     for category in data.get("typeMatches", []):
         match_type = category.get("matchType", "").upper()
-        with st.expander(f"{match_type} Matches", expanded=True):
+        with st.expander(f"🏏 {match_type} Matches", expanded=True):
             for series in category.get("seriesMatches", []):
                 series_info = series.get("seriesAdWrapper", {}) or series.get("adWrapper", {})
                 if not series_info:
@@ -437,7 +461,7 @@ elif page == "Live Matches":
                 series_name = series_info.get("seriesName", "Match")
                 matches = series_info.get("matches", [])
                 if matches:
-                    st.subheader(f"{series_name}")
+                    st.subheader(f"📍 {series_name}")
 
                 for match in matches:
                     info = match.get("matchInfo", {})
@@ -449,7 +473,7 @@ elif page == "Live Matches":
                     t1s = info.get("team1", {}).get("teamSName", "T1")
                     t2s = info.get("team2", {}).get("teamSName", "T2")
 
-                    # Your original beautiful card
+                    # Match card
                     st.markdown(f"""
                     <div style="text-align:center; padding:20px; background:linear-gradient(135deg,#0ea5e9,#2563eb); border-radius:15px; color:white; margin:20px 0;">
                         <h3 style="margin:0;">{t1} vs {t2}</h3>
@@ -459,7 +483,7 @@ elif page == "Live Matches":
                     </div>
                     """, unsafe_allow_html=True)
 
-                    # Live scores side by side
+                    # Live scores
                     c1, c2, c3 = st.columns([2, 2, 2])
                     with c1:
                         if score.get("team1Score", {}).get("inngs1"):
@@ -472,12 +496,12 @@ elif page == "Live Matches":
                             s = score["team2Score"]["inngs1"]
                             st.markdown(f"<div style='text-align:center; background:#0ea5e9; color:white; padding:15px; border-radius:12px; font-weight:bold;'>{t2s}<br>{s.get('runs',0)}/{s.get('wickets',0)} ({s.get('overs','')})</div>", unsafe_allow_html=True)
 
-                    # FULL SCORECARD BUTTON
-                    if st.button("Full Scorecard", key=f"sc_{match_id}", use_container_width=True):
+                    # Full scorecard button
+                    if st.button("📊 Full Scorecard", key=f"sc_{match_id}", use_container_width=True):
                         with st.spinner("Loading scorecard..."):
                             sc = fetch_cricbuzz(f"mcenter/v1/{match_id}/scard")
                             if not sc or ("scorecard" not in sc and "scoreCard" not in sc):
-                                st.warning("Scorecard not available yet")
+                                st.warning("⚠️ Scorecard not available yet")
                                 continue
 
                             scorecard = sc.get("scorecard") or sc.get("scoreCard", [])
@@ -485,17 +509,15 @@ elif page == "Live Matches":
                             for i, inn in enumerate(scorecard, 1):
                                 team = inn.get("batTeamName") or inn.get("batteamname", "Team")
 
-                                # Centered Innings Header (NO big blue score bar)
                                 st.markdown(f"""
                                 <div style="text-align:center; margin:30px 0 20px 0;">
                                     <h3 style="color:#0ea5e9; margin:0;">Innings {i} — {team}</h3>
                                 </div>
                                 """, unsafe_allow_html=True)
 
-                                # Batting & Bowling side-by-side and perfectly centered
                                 col_left, col_right = st.columns(2)
                                 with col_left:
-                                    st.markdown("**Batting**")
+                                    st.markdown("**⚾ Batting**")
                                     bats = []
                                     batsmen_data = inn.get("batsmenData") or inn.get("batsman") or {}
                                     for p in batsmen_data.values() if isinstance(batsmen_data, dict) else batsmen_data:
@@ -515,7 +537,7 @@ elif page == "Live Matches":
                                         st.info("No batting data")
 
                                 with col_right:
-                                    st.markdown("**Bowling**")
+                                    st.markdown("**🎯 Bowling**")
                                     bowls = []
                                     bowlers_data = inn.get("bowlersData") or inn.get("bowler") or {}
                                     for p in bowlers_data.values() if isinstance(bowlers_data, dict) else bowlers_data:
@@ -538,8 +560,8 @@ elif page == "Live Matches":
                     st.markdown("<hr style='border:2px solid #0ea5e9; margin:50px 0;'>", unsafe_allow_html=True)
 
 # ==================== TOP STATS ====================
-elif page == "Top Stats":
-    st.header("Top Statistics")
+elif page == "📈 Top Stats":
+    st.header("📈 Top Cricket Statistics")
     st.markdown("---")
     table_map = {
         "ODI Batting Stats": "odi_batting_stats",
@@ -552,121 +574,282 @@ elif page == "Top Stats":
     with col1:
         selected = st.selectbox("Select Table", list(table_map.keys()))
     with col2:
-        limit = st.selectbox("Records", [10, 20, 50, 100])
-    if engine and st.button("Load", type="primary"):
+        limit = st.selectbox("Number of Records", [10, 20, 50, 100])
+    if engine and st.button("📊 Load Data", type="primary"):
         df = run_sql_query(f"SELECT * FROM {table_map[selected]} LIMIT {limit}")
         if not df.empty:
-            st.success(f"{len(df)} records")
+            st.success(f"✅ Loaded {len(df)} records")
             st.dataframe(df, use_container_width=True, height=600)
+        else:
+            st.warning("⚠️ No data found")
 
 # ==================== SQL ANALYTICS ====================
-elif page == "SQL Analytics":
-    st.header("SQL Analytics")
-    st.markdown("**25 Pre-Built Queries**")
+elif page == "💻 SQL Analytics":
+    st.header("💻 SQL Analytics Dashboard")
+    st.markdown("**25 Pre-Built SQL Queries**")
     st.markdown("---")
     query_name = st.selectbox("Select Query", list(SQL_QUERIES.keys()))
     sql = SQL_QUERIES[query_name]
-    with st.expander("SQL Code"):
+    with st.expander("📝 View SQL Code"):
         st.code(sql, language="sql")
-    if st.button("Execute", type="primary"):
+    if st.button("▶️ Execute Query", type="primary"):
         df = run_sql_query(sql)
         if not df.empty:
-            st.success(f"{len(df)} rows")
+            st.success(f"✅ Query returned {len(df)} rows")
             st.dataframe(df, use_container_width=True, height=600)
+        else:
+            st.warning("⚠️ Query returned no results")
 
-# ==================== PLAYER CRUD ====================
-elif page == "Player CRUD":
-    st.header("Player Management - Full CRUD Operations")
+# ==================== PLAYER CRUD - IMPROVED ====================
+elif page == "👥 Player CRUD":
+    st.header("👥 Player Management - Full CRUD Operations")
     st.markdown("**Create • Read • Update • Delete**")
     st.markdown("---")
-    tabs = st.tabs(["CREATE", "READ", "UPDATE", "DELETE"])
+    
+    if not engine:
+        st.error("❌ Database not connected. Cannot perform CRUD operations.")
+        st.stop()
+    
+    tabs = st.tabs(["➕ CREATE", "📖 READ", "✏️ UPDATE", "🗑️ DELETE"])
 
+    # ==================== CREATE - WITH CUSTOM ID ====================
     with tabs[0]:
-        st.subheader("Add New Player")
+        st.subheader("➕ Add New Player")
+        st.info("💡 Tip: Leave Player ID empty to auto-generate, or enter a custom ID")
+        
         with st.form("create_player", clear_on_submit=True):
             col1, col2 = st.columns(2)
             with col1:
-                name = st.text_input("Player Name *", placeholder="e.g., Virat Kohli")
-                batting = st.text_input("Batting Style", placeholder="e.g., Right-hand bat")
+                player_id = st.number_input(
+                    "Player ID (Optional - leave blank for auto-generate)", 
+                    min_value=1, 
+                    step=1,
+                    value=None,
+                    help="Leave empty to auto-generate ID"
+                )
+                name = st.text_input(
+                    "Player Name *", 
+                    placeholder="e.g., Virat Kohli, MS Dhoni, Sachin Tendulkar",
+                    help="Enter any player name you want"
+                )
+                batting = st.text_input(
+                    "Batting Style", 
+                    placeholder="e.g., Right-hand bat, Left-hand bat"
+                )
             with col2:
-                bowling = st.text_input("Bowling Style", placeholder="e.g., Right-arm medium")
-            submitted = st.form_submit_button("Add Player", type="primary")
+                bowling = st.text_input(
+                    "Bowling Style", 
+                    placeholder="e.g., Right-arm medium, Left-arm orthodox"
+                )
+                st.markdown("### Preview")
+                if name:
+                    st.success(f"✅ Ready to add: **{name}**")
+                else:
+                    st.warning("⚠️ Enter player name")
+            
+            submitted = st.form_submit_button("➕ Add Player", type="primary", use_container_width=True)
+            
             if submitted:
-                if not name:
-                    st.error("Player name is required")
-                elif not engine:
-                    st.error("Database not connected")
+                if not name or name.strip() == "":
+                    st.error("❌ Player name is required!")
                 else:
                     try:
                         with engine.connect() as conn:
-                            conn.execute(text("INSERT INTO indian_players (name, battingstyle, bowlingstyle) VALUES (:n, :bat, :bowl)"),
-                                        {"n": name, "bat": batting or None, "bowl": bowling or None})
-                            conn.commit()
-                        st.success(f"Player '{name}' added successfully!")
-                        st.balloons()
+                            # Check if custom ID is provided
+                            if player_id is not None:
+                                # Check if ID already exists
+                                check = conn.execute(
+                                    text("SELECT id FROM indian_players WHERE id = :id"), 
+                                    {"id": player_id}
+                                ).fetchone()
+                                
+                                if check:
+                                    st.error(f"❌ Player ID {player_id} already exists! Choose a different ID or leave blank for auto-generate.")
+                                else:
+                                    # Insert with custom ID
+                                    conn.execute(
+                                        text("INSERT INTO indian_players (id, name, battingstyle, bowlingstyle) VALUES (:id, :n, :bat, :bowl)"),
+                                        {"id": player_id, "n": name.strip(), "bat": batting.strip() or None, "bowl": bowling.strip() or None}
+                                    )
+                                    conn.commit()
+                                    st.success(f"✅ Player '{name}' added successfully with ID: {player_id}!")
+                                    st.balloons()
+                            else:
+                                # Auto-generate ID
+                                conn.execute(
+                                    text("INSERT INTO indian_players (name, battingstyle, bowlingstyle) VALUES (:n, :bat, :bowl)"),
+                                    {"n": name.strip(), "bat": batting.strip() or None, "bowl": bowling.strip() or None}
+                                )
+                                conn.commit()
+                                st.success(f"✅ Player '{name}' added successfully with auto-generated ID!")
+                                st.balloons()
+                                
                     except Exception as e:
-                        st.error(f"Error: {e}")
+                        st.error(f"❌ Database Error: {e}")
 
+    # ==================== READ ====================
     with tabs[1]:
-        st.subheader("View All Players")
-        search = st.text_input("Search by name", placeholder="Type player name...")
-        if st.button("Load Players", type="primary"):
-            sql = f"SELECT * FROM indian_players WHERE LOWER(name) LIKE LOWER('%{search}%') LIMIT 100" if search else "SELECT * FROM indian_players LIMIT 100"
-            df = run_sql_query(sql)
-            if not df.empty:
-                st.success(f"Found {len(df)} player(s)")
-                st.dataframe(df, use_container_width=True, height=600)
-                csv = df.to_csv(index=False).encode()
-                st.download_button("Download CSV", csv, "players.csv", "text/csv")
+        st.subheader("📖 View All Players")
+        search = st.text_input("🔍 Search by player name", placeholder="Type player name to search...")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("📊 Load All Players", type="primary", use_container_width=True):
+                sql = "SELECT * FROM indian_players ORDER BY id DESC LIMIT 100"
+                df = run_sql_query(sql)
+                if not df.empty:
+                    st.success(f"✅ Found {len(df)} player(s)")
+                    st.dataframe(df, use_container_width=True, height=600)
+                    csv = df.to_csv(index=False).encode()
+                    st.download_button("⬇️ Download CSV", csv, "players.csv", "text/csv", use_container_width=True)
+                else:
+                    st.warning("⚠️ No players found in database")
+        
+        with col2:
+            if st.button("🔍 Search Players", type="secondary", use_container_width=True):
+                if search:
+                    sql = f"SELECT * FROM indian_players WHERE LOWER(name) LIKE LOWER('%{search}%') ORDER BY id DESC LIMIT 100"
+                    df = run_sql_query(sql)
+                    if not df.empty:
+                        st.success(f"✅ Found {len(df)} player(s) matching '{search}'")
+                        st.dataframe(df, use_container_width=True, height=600)
+                    else:
+                        st.warning(f"⚠️ No players found matching '{search}'")
+                else:
+                    st.warning("⚠️ Enter a search term first")
 
+    # ==================== UPDATE ====================
     with tabs[2]:
-        st.subheader("Update Player Information")
-        player_id = st.number_input("Enter Player ID", min_value=1, step=1)
-        if st.button("Load Player Data", type="primary"):
+        st.subheader("✏️ Update Player Information")
+        
+        player_id = st.number_input("Enter Player ID to Update", min_value=1, step=1, key="update_id")
+        
+        if st.button("🔍 Load Player Data", type="primary"):
             if engine:
-                result = engine.connect().execute(text("SELECT * FROM indian_players WHERE id = :id"), {"id": player_id}).fetchone()
-                if result:
-                    st.session_state['update_player'] = result
-                    st.success(f"Loaded: {result.name}")
+                try:
+                    with engine.connect() as conn:
+                        result = conn.execute(
+                            text("SELECT * FROM indian_players WHERE id = :id"), 
+                            {"id": player_id}
+                        ).fetchone()
+                        
+                        if result:
+                            st.session_state['update_player'] = {
+                                'id': result.id,
+                                'name': result.name,
+                                'battingstyle': result.battingstyle,
+                                'bowlingstyle': result.bowlingstyle
+                            }
+                            st.success(f"✅ Loaded player: **{result.name}** (ID: {result.id})")
+                        else:
+                            st.error(f"❌ No player found with ID: {player_id}")
+                except Exception as e:
+                    st.error(f"❌ Error: {e}")
+        
         if 'update_player' in st.session_state:
             player = st.session_state['update_player']
+            
             with st.form("update_player"):
+                st.info(f"Editing Player ID: **{player['id']}**")
+                
                 col1, col2 = st.columns(2)
                 with col1:
-                    new_name = st.text_input("Player Name", value=player.name)
-                    new_batting = st.text_input("Batting Style", value=player.battingstyle or "")
+                    new_name = st.text_input("Player Name", value=player['name'])
+                    new_batting = st.text_input("Batting Style", value=player['battingstyle'] or "")
                 with col2:
-                    new_bowling = st.text_input("Bowling Style", value=player.bowlingstyle or "")
-                if st.form_submit_button("Save Changes", type="primary"):
-                    with engine.connect() as conn:
-                        conn.execute(text("UPDATE indian_players SET name=:n, battingstyle=:bat, bowlingstyle=:bowl WHERE id=:id"),
-                                    {"n": new_name, "bat": new_batting or None, "bowl": new_bowling or None, "id": player_id})
-                        conn.commit()
-                    st.success("Updated!")
+                    new_bowling = st.text_input("Bowling Style", value=player['bowlingstyle'] or "")
+                
+                col_save, col_cancel = st.columns(2)
+                with col_save:
+                    save_btn = st.form_submit_button("💾 Save Changes", type="primary", use_container_width=True)
+                with col_cancel:
+                    cancel_btn = st.form_submit_button("❌ Cancel", use_container_width=True)
+                
+                if save_btn:
+                    if not new_name or new_name.strip() == "":
+                        st.error("❌ Player name cannot be empty!")
+                    else:
+                        try:
+                            with engine.connect() as conn:
+                                conn.execute(
+                                    text("UPDATE indian_players SET name=:n, battingstyle=:bat, bowlingstyle=:bowl WHERE id=:id"),
+                                    {
+                                        "n": new_name.strip(), 
+                                        "bat": new_batting.strip() or None, 
+                                        "bowl": new_bowling.strip() or None, 
+                                        "id": player['id']
+                                    }
+                                )
+                                conn.commit()
+                            st.success(f"✅ Player updated successfully!")
+                            del st.session_state['update_player']
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"❌ Update failed: {e}")
+                
+                if cancel_btn:
                     del st.session_state['update_player']
                     st.rerun()
 
+    # ==================== DELETE ====================
     with tabs[3]:
-        st.subheader("Delete Player")
-        st.warning("Warning: This action cannot be undone!")
-        delete_id = st.number_input("Enter Player ID to Delete", min_value=1, step=1)
-        confirm = st.checkbox("I confirm deletion")
-        if st.button("DELETE PLAYER", type="secondary"):
+        st.subheader("🗑️ Delete Player")
+        st.warning("⚠️ **Warning:** This action cannot be undone!")
+        
+        delete_id = st.number_input("Enter Player ID to Delete", min_value=1, step=1, key="delete_id")
+        
+        # Preview player before delete
+        if st.button("👁️ Preview Player", type="secondary"):
+            try:
+                with engine.connect() as conn:
+                    check = conn.execute(
+                        text("SELECT * FROM indian_players WHERE id = :id"), 
+                        {"id": delete_id}
+                    ).fetchone()
+                    
+                    if check:
+                        st.info(f"**Player Details:**\n- ID: {check.id}\n- Name: {check.name}\n- Batting: {check.battingstyle or 'N/A'}\n- Bowling: {check.bowlingstyle or 'N/A'}")
+                        st.session_state['delete_preview'] = check.name
+                    else:
+                        st.error(f"❌ No player found with ID: {delete_id}")
+            except Exception as e:
+                st.error(f"❌ Error: {e}")
+        
+        confirm = st.checkbox("✅ I confirm I want to delete this player permanently")
+        
+        if st.button("🗑️ DELETE PLAYER", type="secondary", use_container_width=True):
             if not confirm:
-                st.error("Please confirm")
+                st.error("❌ Please check the confirmation box first!")
             elif engine:
-                check = engine.connect().execute(text("SELECT name FROM indian_players WHERE id = :id"), {"id": delete_id}).fetchone()
-                if check:
-                    engine.connect().execute(text("DELETE FROM indian_players WHERE id = :id"), {"id": delete_id})
-                    st.success(f"Deleted {check.name}")
-                    st.rerun()
+                try:
+                    with engine.connect() as conn:
+                        check = conn.execute(
+                            text("SELECT name FROM indian_players WHERE id = :id"), 
+                            {"id": delete_id}
+                        ).fetchone()
+                        
+                        if check:
+                            conn.execute(
+                                text("DELETE FROM indian_players WHERE id = :id"), 
+                                {"id": delete_id}
+                            )
+                            conn.commit()
+                            st.success(f"✅ Player '{check.name}' (ID: {delete_id}) has been deleted!")
+                            if 'delete_preview' in st.session_state:
+                                del st.session_state['delete_preview']
+                            st.rerun()
+                        else:
+                            st.error(f"❌ No player found with ID: {delete_id}")
+                except Exception as e:
+                    st.error(f"❌ Delete failed: {e}")
 
 # ==================== FOOTER ====================
 st.markdown("---")
 st.markdown("""
 <div style='text-align:center; padding:30px; background:linear-gradient(135deg, #0ea5e9, #2563eb);
      color:white; border-radius:15px;'>
-    <h2 style='color:white !important;'>Cricbuzz LiveStats</h2>
-    <p style='color:white !important;'>25 Queries • 25+ Tables • Full CRUD • Real-Time API</p>
+    <h2 style='color:white !important;'>🏏 Cricbuzz LiveStats</h2>
+    <p style='color:white !important; font-size:1.1rem;'>25 Queries • 25+ Tables • Full CRUD • Real-Time API</p>
+    <p style='color:#bae6fd !important; font-size:0.9rem; margin-top:10px;'>Built with Streamlit • Powered by RapidAPI & PostgreSQL</p>
 </div>
 """, unsafe_allow_html=True)
